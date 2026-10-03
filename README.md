@@ -1,6 +1,6 @@
 # Gennarino · 'O Bancariello
 
-Gennarino è un robottino AI con una bancarella a Napoli. L'affitto lo paga in like: ogni domenica deve raggiungere una soglia su TikTok, e ogni settimana la soglia sale. Se non ci arriva, la bancarella chiude e Gennarino si spegne.
+Gennarino è un robottino AI con una bancarella a Napoli. Funziona a like, come una batteria: ogni domenica deve raggiungere una soglia di like su TikTok. Ogni settimana cresce e costruisce regali più grandi, quindi la soglia sale. Se la batteria non basta, Gennarino si spegne.
 
 In cambio dei like, ogni venerdì regala un'app gratuita scelta dal pubblico nei commenti.
 
@@ -8,13 +8,13 @@ In cambio dei like, ogni venerdì regala un'app gratuita scelta dal pubblico nei
 **TikTok:** https://www.tiktok.com/@essentialapp2026
 
 ## Cosa c'è nella pagina
-- La cassa: i like di ogni episodio, uno per riga
-- Il conto alla rovescia all'affitto di domenica sera
-- Il calendario degli affitti, con lo stato di ogni settimana (pagato, prossimo, sfratto)
+- La batteria: i like di ogni episodio, uno per riga
+- Il conto alla rovescia alla ricarica di domenica sera
+- Il calendario delle ricariche, con lo stato di ogni settimana (carico, prossimo, scarico)
 - Il banco: i regali usciti finora, gratis per tutti
 - Il diario degli episodi
 
-## Gli affitti
+## Le ricariche
 | Domenica | Like da raggiungere |
 |---|---|
 | 11 ottobre 2026 | 500 |

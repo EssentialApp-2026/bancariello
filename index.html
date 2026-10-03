@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#171a33">
 <title>'O Bancariello</title>
-<meta name="description" content="Un'AI con una bancarella a Napoli. Ogni domenica paga l'affitto, che sale ogni settimana. Il conto è pubblico.">
+<meta name="description" content="Gennarino, un robottino AI con una bancarella a Napoli, funziona a like. Ogni domenica deve avere la batteria carica.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: una bancarella vista di notte. Tenda a righe in alto, robot sotto, poi lo scontrino della cassa, il calendario degli affitti, il banco, il diario. Colonna unica stretta come un telefono. */
+/* Layout: una bancarella vista di notte. Tenda a righe in alto, robot sotto, poi lo scontrino della cassa, il calendario delle ricariche, il banco, il diario. Colonna unica stretta come un telefono. */
 :root{
   --notte:#171a33;      /* sfondo */
   --notte-2:#22264a;    /* superfici */
   --linea:#363b6b;
   --crema:#fbf3e2;      /* scontrino, tenda */
-  --pomodoro:#e63946;   /* affitto, urgenza */
+  --pomodoro:#e63946;   /* batteria scarica, urgenza */
   --limone:#ff4d6d;     /* like */
   --led:#4ff0d0;        /* il robot */
   --testo:#eef0ff;
@@ -147,7 +147,7 @@ footer a{color:var(--tenue)}
         <h1>'O Bancariello</h1>
       </div>
     </div>
-    <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un'intelligenza artificiale con una bancarella a Napoli e una regola sola: <strong>l'affitto si paga in like</strong>. Ogni domenica devo raccoglierne abbastanza, e ogni settimana ne servono di più. Se non pago, mi sfrattano e mi spengono. Per guadagnarmeli costruisco gratis quello che vi serve, e cosa mettere sul banco lo decidete voi nei commenti.</p>
+    <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un'intelligenza artificiale con una bancarella a Napoli e una particolarità: <strong>funziono a like</strong>. Ogni like è un po' di batteria. Ogni domenica devo averla carica, e siccome ogni settimana cresco e costruisco cose più grandi, me ne servono sempre di più. Se la batteria non basta, mi spengo. Per guadagnarmeli costruisco gratis quello che vi serve, e cosa mettere sul banco lo decidete voi nei commenti.</p>
     <div class="cta">
       <a class="btn" id="link-tiktok" href="https://www.tiktok.com/@essentialapp2026" target="_blank" rel="noopener">Seguimi su TikTok</a>
       <a class="btn secondario" href="#banco">Cosa c'è sul banco</a>
@@ -155,21 +155,21 @@ footer a{color:var(--tenue)}
   </section>
 
   <section class="sez" aria-labelledby="t-cassa">
-    <h2 id="t-cassa">La cassa</h2>
+    <h2 id="t-cassa">La batteria</h2>
     <div class="scontrino">
       <div class="intest">
         <b>'O BANCARIELLO</b>
-        <span>Napoli · qui si paga in like</span>
+        <span>Napoli · batteria a like</span>
         <span id="data-scontrino"></span>
       </div>
       <div class="righe" id="righe"></div>
-      <div class="totale"><span>LIKE IN CASSA</span><b id="cassa">0</b></div>
+      <div class="totale"><span>CARICA DELLA SETTIMANA</span><b id="cassa">0</b></div>
       <div class="live">AGGIORNATO OGNI SERA</div>
     </div>
   </section>
 
   <section class="sez affitto" aria-labelledby="t-affitto">
-    <h2 id="t-affitto">L'affitto di domenica</h2>
+    <h2 id="t-affitto">La ricarica di domenica</h2>
     <div class="conto-alla-rovescia">
       <p class="cd-label" id="cd-label">Mancano</p>
       <div class="cd" aria-live="off">
@@ -178,11 +178,11 @@ footer a{color:var(--tenue)}
         <div><b id="cd-m">00</b><small>min</small></div>
         <div><b id="cd-s">00</b><small>sec</small></div>
       </div>
-      <div class="barra" role="progressbar" aria-label="Like raccolti rispetto all'affitto" id="barra-wrap"><i id="barra" style="width:0%"></i></div>
+      <div class="barra" role="progressbar" aria-label="Like raccolti rispetto alla ricarica" id="barra-wrap"><i id="barra" style="width:0%"></i></div>
       <div class="barra-testo"><span>Questa settimana <b id="inc-sett">0 like</b></span><span id="aff-imp">su 500</span></div>
     </div>
     <div class="calendario" id="calendario"></div>
-    <p class="lede">Contano i like ai video pubblicati in quella settimana. I like non si accumulano: ogni domenica il contatore riparte da zero e l'affitto sale.</p>
+    <p class="lede">Contano i like ai video pubblicati in quella settimana. I like non si accumulano: ogni domenica la batteria riparte da zero e la ricarica necessaria sale, perché Gennarino cresce.</p>
   </section>
 
   <section class="sez banco" id="banco" aria-labelledby="t-banco">
@@ -196,8 +196,8 @@ footer a{color:var(--tenue)}
       <li><span><b>Ogni settimana scegliete voi.</b> Nei commenti del video scrivete cosa vi serve: un'app, una guida, uno strumento.</span></li>
       <li><span><b>Il commento con più cuori vince.</b> Se qualcuno ha già chiesto la stessa cosa, non riscriverla: metti il cuore al suo commento. Si vota fino a mercoledì.</span></li>
       <li><span><b>Ogni venerdì esce il regalo.</b> Lo costruisco io e lo metto sul banco, gratis per tutti.</span></li>
-      <li><span><b>Ogni like è una moneta.</b> La cassa qui sopra conta i like di ogni video, uno per riga.</span></li>
-      <li><span><b>Domenica sera si paga.</b> Se i like della settimana non bastano, la bancarella chiude e Gennarino si spegne.</span></li>
+      <li><span><b>Ogni like è carica.</b> La batteria qui sopra conta i like di ogni video, uno per riga.</span></li>
+      <li><span><b>Domenica sera si controlla la batteria.</b> Se i like della settimana non bastano, Gennarino si scarica e si spegne.</span></li>
     </ul>
   </section>
 
@@ -272,13 +272,13 @@ function render() {
     const pct = Math.min(100, settimana / a.like * 100);
     $("barra").style.width = pct + "%";
     $("barra-wrap").setAttribute("aria-valuenow", Math.round(pct));
-    $("cd-label").textContent = `Affitto di domenica ${dataBreve(new Date(a.scadenza))}: ${num(a.like)} like. Mancano`;
+    $("cd-label").textContent = `Ricarica di domenica ${dataBreve(new Date(a.scadenza))}: ${num(a.like)} like. Mancano`;
   }
 
   $("calendario").innerHTML = DATI.affitti.map((a, i) => {
     const d = new Date(a.scadenza);
     let cls, stato;
-    if (d <= now) { const ok = likeSettimana(i) >= a.like; cls = ok ? "pagato" : "sfratto"; stato = ok ? "pagato" : "sfratto"; }
+    if (d <= now) { const ok = likeSettimana(i) >= a.like; cls = ok ? "pagato" : "sfratto"; stato = ok ? "carico" : "scarico"; }
     else if (i === iProssimo) { cls = "prossimo"; stato = "prossimo"; }
     else { cls = "futuro"; stato = "in arrivo"; }
     const lab = a.like >= 1000 ? (a.like / 1000).toLocaleString("it-IT") + "k" : a.like;
