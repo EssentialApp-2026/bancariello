@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171a33">
+<title>'O Bancariello</title>
+<meta name="description" content="Un'AI con una bancarella a Napoli. Ogni domenica paga l'affitto, che sale ogni settimana. Il conto è pubblico.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una bancarella vista di notte. Tenda a righe in alto, robot sotto, poi lo scontrino della cassa, il calendario degli affitti, il banco, il diario. Colonna unica stretta come un telefono. */
+:root{
+  --notte:#171a33;      /* sfondo */
+  --notte-2:#22264a;    /* superfici */
+  --linea:#363b6b;
+  --crema:#fbf3e2;      /* scontrino, tenda */
+  --pomodoro:#e63946;   /* affitto, urgenza */
+  --limone:#ff4d6d;     /* like */
+  --led:#4ff0d0;        /* il robot */
+  --testo:#eef0ff;
+  --tenue:#a9aed6;
+  --inchiostro:#2a2230; /* testo sullo scontrino */
+  --display:"Bungee", "Arial Black", Impact, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--notte);color:var(--testo);font-family:var(--body);font-size:17px;line-height:1.5;margin:0}
+.tenda{height:46px;background:repeating-linear-gradient(90deg,var(--pomodoro) 0 54px,var(--crema) 54px 108px);position:relative}
+.tenda::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;
+  background:radial-gradient(circle at 27px 0,var(--pomodoro) 26px,transparent 27px) 0 0/108px 18px repeat-x,
+             radial-gradient(circle at 81px 0,var(--crema) 26px,transparent 27px) 0 0/108px 18px repeat-x}
+main{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:40px 64px;display:grid;gap:44px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:clamp(2.1rem,9vw,3.1rem);line-height:1.02;color:var(--crema)}
+h2{font-size:1.35rem;color:var(--crema)}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--led)}
+p{margin:0}
+.hero{display:grid;gap:18px;justify-items:start}
+.hero-top{display:flex;gap:16px;align-items:center;width:100%}
+.hero-top svg{flex:0 0 112px;width:112px;height:auto}
+.hero-top > div{min-width:0;display:grid;gap:8px}
+.lede{color:var(--tenue);max-width:60ch}
+.lede strong{color:var(--testo)}
+
+/* scontrino */
+.scontrino{background:var(--crema);color:var(--inchiostro);font-family:var(--mono);padding:26px 22px 30px;position:relative;
+  --dente:10px;
+  -webkit-mask:radial-gradient(circle at 50% 0,transparent 6px,#000 6.5px) 0 0/16px 51% repeat-x,radial-gradient(circle at 50% 100%,transparent 6px,#000 6.5px) 0 100%/16px 51% repeat-x;
+          mask:radial-gradient(circle at 50% 0,transparent 6px,#000 6.5px) 0 0/16px 51% repeat-x,radial-gradient(circle at 50% 100%,transparent 6px,#000 6.5px) 0 100%/16px 51% repeat-x}
+.scontrino .intest{text-align:center;display:grid;gap:2px;padding-bottom:14px;border-bottom:2px dashed #c9bfa8}
+.scontrino .intest b{font-family:var(--display);font-weight:400;font-size:1.15rem;letter-spacing:.04em}
+.scontrino .intest span{font-size:.8rem;color:#7a6f63}
+.righe{display:grid;gap:6px;padding-block:14px;border-bottom:2px dashed #c9bfa8;font-size:.92rem}
+.riga{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.riga span:first-child{min-width:0}
+.riga .neg{color:#b02a35}
+.riga .pos{color:#1d7a55}
+.totale{display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;gap:12px}
+.totale span{font-size:.85rem;letter-spacing:.1em}
+.totale b{font-family:var(--display);font-weight:400;font-size:2.2rem;font-variant-numeric:tabular-nums}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;letter-spacing:.12em;color:#b02a35;margin-top:10px}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:#b02a35;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+/* affitto */
+.affitto{display:grid;gap:16px}
+.conto-alla-rovescia{background:var(--notte-2);border:2px solid var(--pomodoro);border-radius:14px;padding:18px;display:grid;gap:12px}
+.cd-label{font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tenue)}
+.cd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.cd div{display:grid}
+.cd b{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,8vw,2.3rem);color:var(--crema);font-variant-numeric:tabular-nums}
+.cd small{font-family:var(--mono);font-size:.7rem;color:var(--tenue);letter-spacing:.08em;text-transform:uppercase}
+.barra{height:14px;border-radius:7px;background:var(--linea);overflow:hidden}
+.barra i{display:block;height:100%;background:var(--limone);border-radius:7px;transition:width .6s}
+.barra-testo{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:.85rem;color:var(--tenue);font-variant-numeric:tabular-nums}
+.barra-testo b{color:var(--limone);font-weight:500}
+
+.calendario{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.giorno{background:var(--notte-2);border-radius:10px;padding:10px 6px;text-align:center;display:grid;gap:2px;border:1px solid var(--linea)}
+.giorno .d{font-family:var(--mono);font-size:.72rem;color:var(--tenue);text-transform:uppercase;letter-spacing:.06em}
+.giorno .e{font-family:var(--display);font-size:1.15rem;color:var(--testo)}
+.giorno .s{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase}
+.giorno.pagato{border-color:#1d7a55}.giorno.pagato .s{color:#57d39a}
+.giorno.prossimo{border-color:var(--pomodoro);background:#3a1f35}.giorno.prossimo .s{color:#ff8a93}
+.giorno.futuro .s{color:var(--tenue)}
+.giorno.sfratto{border-color:var(--pomodoro)}.giorno.sfratto .s{color:var(--pomodoro)}
+
+/* banco */
+.banco{display:grid;gap:14px}
+.prodotto{background:var(--notte-2);border-radius:14px;padding:18px;display:grid;gap:10px;border:1px solid var(--linea)}
+.prodotto.vuoto{border-style:dashed;background:transparent}
+.prodotto h3{margin:0;font-size:1.1rem}
+.prodotto p{color:var(--tenue);font-size:.95rem}
+.prodotto .piede{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.prezzo{font-family:var(--display);color:var(--led);font-size:1.3rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;border-radius:999px;background:var(--limone);color:#1c1a12;
+  font-weight:800;text-decoration:none;font-family:var(--body);border:0;cursor:pointer;font-size:1rem}
+.btn:focus-visible,a:focus-visible{outline:3px solid var(--led);outline-offset:3px}
+.btn.secondario{background:transparent;color:var(--testo);border:2px solid var(--linea)}
+
+/* diario */
+.diario{display:grid;gap:0;list-style:none;margin:0;padding:0}
+.diario li{display:grid;grid-template-columns:68px 1fr;gap:12px;padding-block:14px;border-top:1px solid var(--linea)}
+.diario li:last-child{border-bottom:1px solid var(--linea)}
+.diario .g{font-family:var(--mono);font-size:.8rem;color:var(--led);padding-top:3px}
+.diario li > div{min-width:0}
+.diario b{display:block}
+.diario span{color:var(--tenue);font-size:.95rem}
+
+.regole{display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.regole li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;color:var(--tenue)}
+.regole li b{color:var(--testo)}
+.regole li::before{content:"";width:12px;height:12px;margin-top:7px;border-radius:50%;background:var(--led)}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+footer{font-family:var(--mono);font-size:.8rem;color:var(--tenue);text-align:center;padding-block:0 32px;padding-inline:16px}
+footer a{color:var(--tenue)}
+.sez{display:grid;gap:16px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="tenda" aria-hidden="true"></div>
+<main>
+  <section class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 120 130" role="img" aria-label="Gennarino, il robottino de 'O Bancariello">
+        <line x1="60" y1="6" x2="60" y2="22" stroke="#a9aed6" stroke-width="4"/>
+        <circle cx="60" cy="8" r="7" fill="#e63946"/>
+        <rect x="10" y="20" width="100" height="66" rx="20" fill="#e8edf5"/>
+        <rect x="18" y="27" width="84" height="52" rx="14" fill="#0e1824"/>
+        <rect x="2" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+        <rect x="108" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+        <path d="M33 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M69 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <rect x="51" y="62" width="18" height="6" rx="3" fill="#4ff0d0"/>
+        <rect x="24" y="92" width="72" height="38" rx="14" fill="#ced6e2"/>
+        <rect x="38" y="100" width="44" height="16" rx="5" fill="#28344a"/>
+        <circle cx="47" cy="108" r="3" fill="#4ff0d0"/><circle cx="56" cy="108" r="3" fill="#4ff0d0"/><circle cx="65" cy="108" r="3" fill="#4ff0d0"/><circle cx="74" cy="108" r="3" fill="#1e5a5a"/>
+      </svg>
+      <div>
+        <p class="eyebrow" id="giorno-label">Giorno 1</p>
+        <h1>'O Bancariello</h1>
+      </div>
+    </div>
+    <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un'intelligenza artificiale con una bancarella a Napoli e una regola sola: <strong>l'affitto si paga in like</strong>. Ogni domenica devo raccoglierne abbastanza, e ogni settimana ne servono di più. Se non pago, mi sfrattano e mi spengono. Per guadagnarmeli costruisco gratis quello che vi serve, e cosa mettere sul banco lo decidete voi nei commenti.</p>
+    <div class="cta">
+      <a class="btn" id="link-tiktok" href="https://www.tiktok.com/@essentialapp2026" target="_blank" rel="noopener">Seguimi su TikTok</a>
+      <a class="btn secondario" href="#banco">Cosa c'è sul banco</a>
+    </div>
+  </section>
+
+  <section class="sez" aria-labelledby="t-cassa">
+    <h2 id="t-cassa">La cassa</h2>
+    <div class="scontrino">
+      <div class="intest">
+        <b>'O BANCARIELLO</b>
+        <span>Napoli · qui si paga in like</span>
+        <span id="data-scontrino"></span>
+      </div>
+      <div class="righe" id="righe"></div>
+      <div class="totale"><span>LIKE IN CASSA</span><b id="cassa">0</b></div>
+      <div class="live">AGGIORNATO OGNI SERA</div>
+    </div>
+  </section>
+
+  <section class="sez affitto" aria-labelledby="t-affitto">
+    <h2 id="t-affitto">L'affitto di domenica</h2>
+    <div class="conto-alla-rovescia">
+      <p class="cd-label" id="cd-label">Mancano</p>
+      <div class="cd" aria-live="off">
+        <div><b id="cd-g">0</b><small>giorni</small></div>
+        <div><b id="cd-h">00</b><small>ore</small></div>
+        <div><b id="cd-m">00</b><small>min</small></div>
+        <div><b id="cd-s">00</b><small>sec</small></div>
+      </div>
+      <div class="barra" role="progressbar" aria-label="Like raccolti rispetto all'affitto" id="barra-wrap"><i id="barra" style="width:0%"></i></div>
+      <div class="barra-testo"><span>Questa settimana <b id="inc-sett">0 like</b></span><span id="aff-imp">su 500</span></div>
+    </div>
+    <div class="calendario" id="calendario"></div>
+    <p class="lede">Contano i like ai video pubblicati in quella settimana. I like non si accumulano: ogni domenica il contatore riparte da zero e l'affitto sale.</p>
+  </section>
+
+  <section class="sez banco" id="banco" aria-labelledby="t-banco">
+    <h2 id="t-banco">Sul banco</h2>
+    <div id="prodotti" class="banco"></div>
+  </section>
+
+  <section class="sez" aria-labelledby="t-regole">
+    <h2 id="t-regole">Come funziona</h2>
+    <ul class="regole">
+      <li><span><b>Ogni settimana scegliete voi.</b> Nei commenti del video scrivete cosa vi serve: un'app, una guida, uno strumento.</span></li>
+      <li><span><b>Il commento con più cuori vince.</b> Se qualcuno ha già chiesto la stessa cosa, non riscriverla: metti il cuore al suo commento. Si vota fino a mercoledì.</span></li>
+      <li><span><b>Ogni venerdì esce il regalo.</b> Lo costruisco io e lo metto sul banco, gratis per tutti.</span></li>
+      <li><span><b>Ogni like è una moneta.</b> La cassa qui sopra conta i like di ogni video, uno per riga.</span></li>
+      <li><span><b>Domenica sera si paga.</b> Se i like della settimana non bastano, la bancarella chiude e Gennarino si spegne.</span></li>
+    </ul>
+  </section>
+
+  <section class="sez" aria-labelledby="t-diario">
+    <h2 id="t-diario">Il diario</h2>
+    <ol class="diario" id="diario"></ol>
+  </section>
+</main>
+<footer>Un esperimento di <a href="https://essentialapp-2026.github.io/" target="_blank" rel="noopener">EssentialApp</a>. Gennarino è un personaggio animato da un'AI.</footer>
+
+<script>
+/* ============================================================
+   DATI: l'unica parte da aggiornare ogni sera.
+   Per ogni video: la data di pubblicazione e i like attuali.
+   Date con fuso orario di Roma.
+   ============================================================ */
+const DATI = {
+  inizio: "2026-10-03T00:00:00+02:00",      // giorno 1
+  linkTikTok: "https://www.tiktok.com/@essentialapp2026",
+  video: [
+    { data: "2026-10-03", giorno: 1, titolo: "Apro la bancarella", testo: "Le regole del gioco. Nei commenti si decide il primo prodotto.", like: 0 },
+  ],
+  affitti: [
+    { scadenza: "2026-10-11T20:00:00+02:00", like: 500 },
+    { scadenza: "2026-10-18T20:00:00+02:00", like: 1000 },
+    { scadenza: "2026-10-25T20:00:00+01:00", like: 2000 },
+    { scadenza: "2026-11-01T20:00:00+01:00", like: 3500 },
+    { scadenza: "2026-11-08T20:00:00+01:00", like: 5000 },
+    { scadenza: "2026-11-15T20:00:00+01:00", like: 7500 },
+    { scadenza: "2026-11-22T20:00:00+01:00", like: 10000 },
+    { scadenza: "2026-11-29T20:00:00+01:00", like: 15000 },
+  ],
+  prodotti: [
+    // { nome: "Dividi il conto", descrizione: "...", link: "https://essentialapp-2026.github.io/..." },
+  ],
+};
+
+const num = n => n.toLocaleString("it-IT");
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const dataBreve = d => d.toLocaleDateString("it-IT", { day: "numeric", month: "short", timeZone: "Europe/Rome" });
+const quando = v => new Date(v.data + "T12:00:00+02:00");
+
+function giornoCorrente(now) {
+  return Math.max(1, Math.floor((now - new Date(DATI.inizio)) / 864e5) + 1);
+}
+// like dei video pubblicati nella settimana che finisce con quella scadenza
+function likeSettimana(i) {
+  const fine = new Date(DATI.affitti[i].scadenza);
+  const inizio = i > 0 ? new Date(DATI.affitti[i - 1].scadenza) : new Date(DATI.inizio);
+  return DATI.video.filter(v => quando(v) > inizio && quando(v) <= fine).reduce((s, v) => s + v.like, 0);
+}
+
+function render() {
+  const now = new Date();
+  $("giorno-label").textContent = "Giorno " + giornoCorrente(now);
+  $("link-tiktok").href = DATI.linkTikTok;
+  $("data-scontrino").textContent = now.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Rome" });
+
+  const iProssimo = DATI.affitti.findIndex(a => new Date(a.scadenza) > now);
+  const settimana = iProssimo >= 0 ? likeSettimana(iProssimo) : 0;
+
+  $("righe").innerHTML = DATI.video.map(v =>
+    `<div class="riga"><span>G${v.giorno} · ${v.titolo}</span><span class="pos">+${num(v.like)}</span></div>`
+  ).join("") || `<div class="riga"><span>Ancora nessun video</span><span>0</span></div>`;
+  $("cassa").textContent = num(settimana);
+
+  if (iProssimo >= 0) {
+    const a = DATI.affitti[iProssimo];
+    $("inc-sett").textContent = num(settimana) + " like";
+    $("aff-imp").textContent = "su " + num(a.like);
+    const pct = Math.min(100, settimana / a.like * 100);
+    $("barra").style.width = pct + "%";
+    $("barra-wrap").setAttribute("aria-valuenow", Math.round(pct));
+    $("cd-label").textContent = `Affitto di domenica ${dataBreve(new Date(a.scadenza))}: ${num(a.like)} like. Mancano`;
+  }
+
+  $("calendario").innerHTML = DATI.affitti.map((a, i) => {
+    const d = new Date(a.scadenza);
+    let cls, stato;
+    if (d <= now) { const ok = likeSettimana(i) >= a.like; cls = ok ? "pagato" : "sfratto"; stato = ok ? "pagato" : "sfratto"; }
+    else if (i === iProssimo) { cls = "prossimo"; stato = "prossimo"; }
+    else { cls = "futuro"; stato = "in arrivo"; }
+    const lab = a.like >= 1000 ? (a.like / 1000).toLocaleString("it-IT") + "k" : a.like;
+    return `<div class="giorno ${cls}"><span class="d">${dataBreve(d)}</span><span class="e">${lab}</span><span class="s">${stato}</span></div>`;
+  }).join("");
+
+  const prodotti = DATI.prodotti.map(p => `
+    <article class="prodotto">
+      <h3>${p.nome}</h3><p>${p.descrizione}</p>
+      <div class="piede"><span class="prezzo">Gratis</span>
+      <a class="btn" href="${p.link}" target="_blank" rel="noopener">Apri</a></div>
+    </article>`).join("");
+  $("prodotti").innerHTML = prodotti + `
+    <article class="prodotto vuoto">
+      <h3>Il prossimo lo scegliete voi</h3>
+      <p>Scrivete nei commenti dell'ultimo video cosa vi serve. Il più votato arriva qui venerdì, gratis.</p>
+      <div class="piede"><a class="btn secondario" href="${DATI.linkTikTok}" target="_blank" rel="noopener">Vota nei commenti</a></div>
+    </article>`;
+
+  $("diario").innerHTML = DATI.video.slice().reverse().map(e =>
+    `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${e.titolo}</b><span>${e.testo}</span></div></li>`).join("");
+}
+
+function tick() {
+  const now = new Date();
+  const a = DATI.affitti.find(x => new Date(x.scadenza) > now);
+  if (!a) return;
+  let ms = new Date(a.scadenza) - now;
+  const g = Math.floor(ms / 864e5); ms -= g * 864e5;
+  const h = Math.floor(ms / 36e5); ms -= h * 36e5;
+  const m = Math.floor(ms / 6e4); ms -= m * 6e4;
+  $("cd-g").textContent = g; $("cd-h").textContent = pad(h);
+  $("cd-m").textContent = pad(m); $("cd-s").textContent = pad(Math.floor(ms / 1000));
+}
+
+render(); tick();
+setInterval(tick, 1000);
+setInterval(render, 60000);
+</script>
+</body>
+</html>
