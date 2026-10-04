@@ -3,7 +3,7 @@
 Gennarino è un robottino AI con una bancarella a Napoli. Ogni settimana il pubblico vota nei commenti su TikTok l'app che gli serve, e il venerdì Gennarino la costruisce e la regala sul banco, gratis per tutti.
 
 **Pagina live:** https://essentialapp-2026.github.io/bancariello/
-**TikTok:** https://www.tiktok.com/@essentialapp2026
+**TikTok:** https://www.tiktok.com/@o.bancariello.e.g
 
 ## Cosa c'è nella pagina
 - Il voto della settimana: le idee in gara e i voti contati dai commenti
