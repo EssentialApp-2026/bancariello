@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#171a33">
 <title>'O Bancariello</title>
-<meta name="description" content="Gennarino, un robottino AI con una bancarella a Napoli, funziona a like. Ogni domenica deve avere la batteria carica.">
+<meta name="description" content="Gennarino, un robottino AI con una bancarella a Napoli, ogni venerdì regala l'app più votata nei commenti.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: una bancarella vista di notte. Tenda a righe in alto, robot sotto, poi lo scontrino della cassa, il calendario delle ricariche, il banco, il diario. Colonna unica stretta come un telefono. */
+/* Layout: una bancarella vista di notte. Tenda a righe in alto, robot sotto, poi il voto della settimana come scontrino, il banco, il diario. Colonna unica stretta come un telefono. */
 :root{
   --notte:#171a33;      /* sfondo */
   --notte-2:#22264a;    /* superfici */
   --linea:#363b6b;
   --crema:#fbf3e2;      /* scontrino, tenda */
-  --pomodoro:#e63946;   /* batteria scarica, urgenza */
+  --pomodoro:#e63946;   /* accento caldo, urgenza */
   --limone:#ff4d6d;     /* like */
   --led:#4ff0d0;        /* il robot */
   --testo:#eef0ff;
@@ -147,42 +147,35 @@ footer a{color:var(--tenue)}
         <h1>'O Bancariello</h1>
       </div>
     </div>
-    <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un'intelligenza artificiale con una bancarella a Napoli e una particolarità: <strong>funziono a like</strong>. Ogni like è un po' di batteria. Ogni domenica devo averla carica, e siccome ogni settimana cresco e costruisco cose più grandi, me ne servono sempre di più. Se la batteria non basta, mi spengo. Per guadagnarmeli costruisco gratis quello che vi serve, e cosa mettere sul banco lo decidete voi nei commenti.</p>
+    <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un robottino con una bancarella a Napoli. Ogni settimana mi dite nei commenti cosa vi serve, e il <strong>venerdì</strong> l'app più votata la costruisco io e la metto sul banco, <strong>gratis per tutti</strong>.</p>
     <div class="cta">
       <a class="btn" id="link-tiktok" href="https://www.tiktok.com/@essentialapp2026" target="_blank" rel="noopener">Seguimi su TikTok</a>
       <a class="btn secondario" href="#banco">Cosa c'è sul banco</a>
     </div>
   </section>
 
-  <section class="sez" aria-labelledby="t-cassa">
-    <h2 id="t-cassa">La batteria</h2>
-    <div class="scontrino">
-      <div class="intest">
-        <b>'O BANCARIELLO</b>
-        <span>Napoli · batteria a like</span>
-        <span id="data-scontrino"></span>
-      </div>
-      <div class="righe" id="righe"></div>
-      <div class="totale"><span>CARICA DELLA SETTIMANA</span><b id="cassa">0</b></div>
-      <div class="live">AGGIORNATO OGNI SERA</div>
-    </div>
-  </section>
-
-  <section class="sez affitto" aria-labelledby="t-affitto">
-    <h2 id="t-affitto">La ricarica di domenica</h2>
+  <section class="sez affitto" aria-labelledby="t-voto">
+    <h2 id="t-voto">Il voto della settimana</h2>
     <div class="conto-alla-rovescia">
-      <p class="cd-label" id="cd-label">Mancano</p>
+      <p class="cd-label" id="cd-label">Il regalo esce tra</p>
       <div class="cd" aria-live="off">
         <div><b id="cd-g">0</b><small>giorni</small></div>
         <div><b id="cd-h">00</b><small>ore</small></div>
         <div><b id="cd-m">00</b><small>min</small></div>
         <div><b id="cd-s">00</b><small>sec</small></div>
       </div>
-      <div class="barra" role="progressbar" aria-label="Like raccolti rispetto alla ricarica" id="barra-wrap"><i id="barra" style="width:0%"></i></div>
-      <div class="barra-testo"><span>Questa settimana <b id="inc-sett">0 like</b></span><span id="aff-imp">su 500</span></div>
     </div>
-    <div class="calendario" id="calendario"></div>
-    <p class="lede">Contano i like ai video pubblicati in quella settimana. I like non si accumulano: ogni domenica la batteria riparte da zero e la ricarica necessaria sale, perché Gennarino cresce.</p>
+    <div class="scontrino">
+      <div class="intest">
+        <b>'O BANCARIELLO</b>
+        <span>Voti dai commenti su TikTok</span>
+        <span id="data-scontrino"></span>
+      </div>
+      <div class="righe" id="righe"></div>
+      <div class="totale"><span>VOTI TOTALI</span><b id="cassa">0</b></div>
+      <div class="live">AGGIORNATO OGNI SERA</div>
+    </div>
+    <p class="lede">Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a mercoledì sera.</p>
   </section>
 
   <section class="sez banco" id="banco" aria-labelledby="t-banco">
@@ -194,10 +187,9 @@ footer a{color:var(--tenue)}
     <h2 id="t-regole">Come funziona</h2>
     <ul class="regole">
       <li><span><b>Ogni settimana scegliete voi.</b> Nei commenti del video scrivete cosa vi serve: un'app, una guida, uno strumento.</span></li>
-      <li><span><b>Il commento con più cuori vince.</b> Se qualcuno ha già chiesto la stessa cosa, non riscriverla: metti il cuore al suo commento. Si vota fino a mercoledì.</span></li>
+      <li><span><b>Si vota con una lettera.</b> Nel video trovi tre idee, A, B o C: scrivi la lettera nei commenti, oppure proponi la tua. Si vota fino a mercoledì.</span></li>
       <li><span><b>Ogni venerdì esce il regalo.</b> Lo costruisco io e lo metto sul banco, gratis per tutti.</span></li>
-      <li><span><b>Ogni like è carica.</b> La batteria qui sopra conta i like di ogni video, uno per riga.</span></li>
-      <li><span><b>Domenica sera si controlla la batteria.</b> Se i like della settimana non bastano, Gennarino si scarica e si spegne.</span></li>
+      <li><span><b>Tutto gratis.</b> Le app si aprono dal telefono, senza registrazione e senza pubblicità.</span></li>
     </ul>
   </section>
 
@@ -210,45 +202,37 @@ footer a{color:var(--tenue)}
 
 <script>
 /* ============================================================
-   DATI: l'unica parte da aggiornare ogni sera.
-   Per ogni video: la data di pubblicazione e i like attuali.
+   DATI: l'unica parte da aggiornare.
    Date con fuso orario di Roma.
    ============================================================ */
 const DATI = {
   inizio: "2026-10-03T00:00:00+02:00",      // giorno 1
   linkTikTok: "https://www.tiktok.com/@essentialapp2026",
-  video: [
-    { data: "2026-10-03", giorno: 1, titolo: "Apro la bancarella", testo: "Le regole del gioco. Nei commenti si decide il primo prodotto.", like: 0 },
-  ],
-  affitti: [
-    { scadenza: "2026-10-11T20:00:00+02:00", like: 500 },
-    { scadenza: "2026-10-18T20:00:00+02:00", like: 1000 },
-    { scadenza: "2026-10-25T20:00:00+01:00", like: 2000 },
-    { scadenza: "2026-11-01T20:00:00+01:00", like: 3500 },
-    { scadenza: "2026-11-08T20:00:00+01:00", like: 5000 },
-    { scadenza: "2026-11-15T20:00:00+01:00", like: 7500 },
-    { scadenza: "2026-11-22T20:00:00+01:00", like: 10000 },
-    { scadenza: "2026-11-29T20:00:00+01:00", like: 15000 },
-  ],
+  // voto in corso: lettera, idea, voti contati dai commenti
+  voto: {
+    uscita: "2026-10-09T19:00:00+02:00",    // venerdì: esce il regalo
+    opzioni: [
+      { lettera: "A", idea: "Dividi 'o cunto in pizzeria", voti: 0 },
+      { lettera: "B", idea: "Timer p' 'a moka", voti: 0 },
+      { lettera: "C", idea: "Lista d' 'a spesa cu 'a voce", voti: 0 },
+    ],
+  },
   prodotti: [
-    // { nome: "Dividi il conto", descrizione: "...", link: "https://essentialapp-2026.github.io/..." },
+    // { nome: "Dividi 'o cunto", descrizione: "...", link: "https://essentialapp-2026.github.io/..." },
+  ],
+  diario: [
+    { giorno: 2, titolo: "Tre idee sul banco", testo: "A, B o C: si vota nei commenti fino a mercoledì." },
+    { giorno: 1, titolo: "Apro la bancarella", testo: "Gennarino si presenta." },
   ],
 };
 
 const num = n => n.toLocaleString("it-IT");
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
-const dataBreve = d => d.toLocaleDateString("it-IT", { day: "numeric", month: "short", timeZone: "Europe/Rome" });
-const quando = v => new Date(v.data + "T12:00:00+02:00");
+const dataBreve = d => d.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome" });
 
 function giornoCorrente(now) {
   return Math.max(1, Math.floor((now - new Date(DATI.inizio)) / 864e5) + 1);
-}
-// like dei video pubblicati nella settimana che finisce con quella scadenza
-function likeSettimana(i) {
-  const fine = new Date(DATI.affitti[i].scadenza);
-  const inizio = i > 0 ? new Date(DATI.affitti[i - 1].scadenza) : new Date(DATI.inizio);
-  return DATI.video.filter(v => quando(v) > inizio && quando(v) <= fine).reduce((s, v) => s + v.like, 0);
 }
 
 function render() {
@@ -257,33 +241,14 @@ function render() {
   $("link-tiktok").href = DATI.linkTikTok;
   $("data-scontrino").textContent = now.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Rome" });
 
-  const iProssimo = DATI.affitti.findIndex(a => new Date(a.scadenza) > now);
-  const settimana = iProssimo >= 0 ? likeSettimana(iProssimo) : 0;
-
-  $("righe").innerHTML = DATI.video.map(v =>
-    `<div class="riga"><span>G${v.giorno} · ${v.titolo}</span><span class="pos">+${num(v.like)}</span></div>`
-  ).join("") || `<div class="riga"><span>Ancora nessun video</span><span>0</span></div>`;
-  $("cassa").textContent = num(settimana);
-
-  if (iProssimo >= 0) {
-    const a = DATI.affitti[iProssimo];
-    $("inc-sett").textContent = num(settimana) + " like";
-    $("aff-imp").textContent = "su " + num(a.like);
-    const pct = Math.min(100, settimana / a.like * 100);
-    $("barra").style.width = pct + "%";
-    $("barra-wrap").setAttribute("aria-valuenow", Math.round(pct));
-    $("cd-label").textContent = `Ricarica di domenica ${dataBreve(new Date(a.scadenza))}: ${num(a.like)} like. Mancano`;
-  }
-
-  $("calendario").innerHTML = DATI.affitti.map((a, i) => {
-    const d = new Date(a.scadenza);
-    let cls, stato;
-    if (d <= now) { const ok = likeSettimana(i) >= a.like; cls = ok ? "pagato" : "sfratto"; stato = ok ? "carico" : "scarico"; }
-    else if (i === iProssimo) { cls = "prossimo"; stato = "prossimo"; }
-    else { cls = "futuro"; stato = "in arrivo"; }
-    const lab = a.like >= 1000 ? (a.like / 1000).toLocaleString("it-IT") + "k" : a.like;
-    return `<div class="giorno ${cls}"><span class="d">${dataBreve(d)}</span><span class="e">${lab}</span><span class="s">${stato}</span></div>`;
-  }).join("");
+  const ops = DATI.voto.opzioni;
+  const tot = ops.reduce((s, o) => s + o.voti, 0);
+  const max = Math.max(...ops.map(o => o.voti));
+  $("righe").innerHTML = ops.map(o =>
+    `<div class="riga"><span><b>${o.lettera}</b> · ${o.idea}</span><span class="${tot && o.voti === max ? "pos" : ""}">${num(o.voti)}</span></div>`
+  ).join("");
+  $("cassa").textContent = num(tot);
+  $("cd-label").textContent = "Il regalo esce " + dataBreve(new Date(DATI.voto.uscita)) + ". Mancano";
 
   const prodotti = DATI.prodotti.map(p => `
     <article class="prodotto">
@@ -293,20 +258,18 @@ function render() {
     </article>`).join("");
   $("prodotti").innerHTML = prodotti + `
     <article class="prodotto vuoto">
-      <h3>Il prossimo lo scegliete voi</h3>
-      <p>Scrivete nei commenti dell'ultimo video cosa vi serve. Il più votato arriva qui venerdì, gratis.</p>
-      <div class="piede"><a class="btn secondario" href="${DATI.linkTikTok}" target="_blank" rel="noopener">Vota nei commenti</a></div>
+      <h3>Il primo regalo arriva venerdì</h3>
+      <p>Vince l'idea più votata nei commenti. La trovi qui, gratis, appena esce.</p>
+      <div class="piede"><a class="btn secondario" href="${DATI.linkTikTok}" target="_blank" rel="noopener">Vota su TikTok</a></div>
     </article>`;
 
-  $("diario").innerHTML = DATI.video.slice().reverse().map(e =>
+  $("diario").innerHTML = DATI.diario.map(e =>
     `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${e.titolo}</b><span>${e.testo}</span></div></li>`).join("");
 }
 
 function tick() {
-  const now = new Date();
-  const a = DATI.affitti.find(x => new Date(x.scadenza) > now);
-  if (!a) return;
-  let ms = new Date(a.scadenza) - now;
+  let ms = new Date(DATI.voto.uscita) - new Date();
+  if (ms < 0) ms = 0;
   const g = Math.floor(ms / 864e5); ms -= g * 864e5;
   const h = Math.floor(ms / 36e5); ms -= h * 36e5;
   const m = Math.floor(ms / 6e4); ms -= m * 6e4;
