@@ -130,6 +130,7 @@ footer a{color:var(--tenue)}
 .riga em{font-style:normal;font-size:.72rem;letter-spacing:.08em;color:#1d7a55;white-space:nowrap}
 .uscito{display:grid;gap:12px;justify-items:start}
 .uscito b{font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--crema)}
+.uscito .lede{font-size:.98rem}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -226,7 +227,7 @@ const DATI = {
     chiude: "2026-10-07T23:59:00+02:00",    // mercoledì sera
     uscita: "2026-10-09T19:00:00+02:00",    // venerdì alle 19: esce il regalo
     conteggio: "",                          // quando sono stati contati i voti dai commenti (vuoto: non ancora)
-    vince: "",                              // la lettera vincente, a voto chiuso
+    vince: "",                              // la lettera vincente, a voto chiuso; "nessuno" se nei commenti non ha votato nessuno (niente app)
     opzioni: [
       { lettera: "A", idea: "Dividi 'o cunto in pizzeria", voti: 0 },
       { lettera: "B", idea: "Timer p' 'a moka", voti: 0 },
@@ -273,23 +274,29 @@ function render() {
   const tot = ops.reduce((s, o) => s + o.voti, 0);
   const max = Math.max(...ops.map(o => o.voti));
   const primi = ops.filter(o => o.voti === max);
-  const vince = V.vince || (chiuso && tot && primi.length === 1 ? primi[0].lettera : "");
+  const zero = V.vince === "nessuno";   // nessuno ha votato: questa settimana niente app
+  const vince = zero ? "" : V.vince || (chiuso && tot && primi.length === 1 ? primi[0].lettera : "");
   $("righe").innerHTML = ops.map(o =>
     `<div class="riga${o.lettera === vince ? " vince" : ""}"><span><b>${esc(o.lettera)}</b> · ${esc(o.idea)}${o.lettera === vince ? " <em>★ HA VINTO</em>" : ""}</span><span class="${tot && o.voti === max ? "pos" : ""}">${num(o.voti)}</span></div>`
   ).join("");
   $("cassa").textContent = num(tot);
-  $("live").textContent = chiuso ? (vince ? "VOTO CHIUSO · HA VINTO LA " + vince : "VOTO CHIUSO · STO CONTANDO")
+  $("live").textContent = zero ? "VOTO CHIUSO · NESSUN VOTO" : chiuso ? (vince ? "VOTO CHIUSO · HA VINTO LA " + vince : "VOTO CHIUSO · STO CONTANDO")
     : V.conteggio ? "CONTEGGIO DI " + dataBreve(new Date(V.conteggio)).toUpperCase() : "PRIMO CONTEGGIO IN ARRIVO";
-  $("come-votare").textContent = chiuso
+  $("come-votare").textContent = zero
+    ? "Questa settimana nei commenti non ha votato nessuno, quindi niente app. Lunedì arrivano tre idee nuove: basta una lettera nei commenti per decidere."
+    : chiuso
     ? "Il voto di questa settimana è chiuso. Lunedì arrivano tre idee nuove: tieni d'occhio TikTok."
     : "Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a " + dataBreve(new Date(V.chiude)) + " sera.";
 
   // il conto alla rovescia, oppure il regalo già uscito
   const reg = regaloSettimana(), uscito = now >= uscita;
   uscitoGia = uscito;
-  $("cd").hidden = uscito;
-  $("uscito").hidden = !uscito;
-  if (uscito) {
+  $("cd").hidden = uscito || zero;
+  $("uscito").hidden = !uscito && !zero;
+  if (zero) {
+    $("cd-label").textContent = "Voto chiuso";
+    $("uscito").innerHTML = `<b>😔 Questa settimana niente regalo</b><p class="lede">Nei commenti non ha votato nessuno, e le app le scegliete voi. Lunedì tre idee nuove.</p><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Seguimi su TikTok</a>`;
+  } else if (uscito) {
     $("cd-label").textContent = "Venerdì " + uscita.toLocaleDateString("it-IT", { day: "numeric", month: "long", timeZone: "Europe/Rome" });
     $("uscito").innerHTML = reg
       ? `<b>${esc(reg.emoji || "🎁")} ${esc(reg.nome)} è sul banco!</b><a class="btn" href="${esc(reg.link)}"${esterno(reg.link) ? ' target="_blank" rel="noopener"' : ""}>Aprilo, è gratis</a>`
@@ -313,7 +320,12 @@ function render() {
       ${vinto}
     </article>`;
   };
-  const attesa = !reg && !uscito ? `
+  const attesa = zero ? `
+    <article class="prodotto vuoto">
+      <h3>Questa settimana il banco resta vuoto</h3>
+      <p>Nessuno ha votato, quindi niente app. Lunedì tre idee nuove: vota con una lettera nei commenti.</p>
+      <div class="piede"><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Vota su TikTok</a></div>
+    </article>` : !reg && !uscito ? `
     <article class="prodotto vuoto">
       <h3>${DATI.prodotti.length ? "Il regalo di questa settimana" : "Il primo regalo"} arriva ${esc(dataBreve(uscita))}</h3>
       <p>Vince l'idea più votata nei commenti. La trovi qui, gratis, appena esce.</p>

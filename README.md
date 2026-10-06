@@ -18,6 +18,7 @@ Tutto sta in un unico file, `index.html`, senza dipendenze. I dati sono nel bloc
 - **Lunedì**: tre idee nuove in `voto.opzioni` (voti a zero), con `voto.chiude` (mercoledì sera) e `voto.uscita` (venerdì alle 19). `conteggio` e `vince` tornano vuoti.
 - **Le sere di voto**: i voti contati dai commenti (dal conta-voti di Spinta, «Copia per Claude») vanno in `voti`, con l'ora in `voto.conteggio`.
 - **Giovedì**: a voto chiuso, `voto.vince` prende la lettera vincente e il regalo entra nella cartella `regali/` e in `prodotti`, con `esce` uguale a `voto.uscita`.
+  Se nei commenti non ha votato nessuno, `voto.vince` diventa `"nessuno"`: quella settimana non esce nessuna app e la pagina lo dice al posto del conto alla rovescia.
 - **Venerdì alle 19**: il regalo si apre da solo. Fino a quell'ora sul banco si vede «In arrivo» con l'orario; dopo, il bottone «Apri» e, in alto, «Apri il regalo».
 - Ogni puntata importante va nel `diario`.
 
