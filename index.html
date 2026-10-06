@@ -238,6 +238,24 @@ const DATI = {
   prodotti: [
     // { nome: "Timer p' 'a moka", emoji: "☕", descrizione: "...", link: "regali/timer-moka/", esce: "2026-10-09T19:00:00+02:00", lettera: "B", voti: 0 },
   ],
+  // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
+  prossimo: {
+    dal: "2026-10-12T00:00:00+02:00",
+    voto: {
+      chiude: "2026-10-14T23:59:00+02:00",
+      uscita: "2026-10-16T19:00:00+02:00",
+      conteggio: "",
+      vince: "",
+      opzioni: [
+        { lettera: "A", idea: "'A munnezza 'e stasera", voti: 0 },
+        { lettera: "B", idea: "Addò aggio parcheggiato?", voti: 0 },
+        { lettera: "C", idea: "'E punte d' 'a scopa", voti: 0 },
+      ],
+    },
+    diario: [
+      { giorno: 10, titolo: "Tre idee nuove sul banco", testo: "La differenziata, il parcheggio e la scopa: si vota nei commenti fino a mercoledì." },
+    ],
+  },
   diario: [
     { giorno: 2, titolo: "Tre idee sul banco", testo: "A, B o C: si vota nei commenti fino a mercoledì." },
     { giorno: 1, titolo: "Apro la bancarella", testo: "Gennarino si presenta." },
@@ -257,14 +275,19 @@ function giornoCorrente(now) {
   return Math.max(1, Math.floor((now - new Date(DATI.inizio)) / 864e5) + 1);
 }
 // il regalo legato al voto di questa settimana (esce all'ora dell'uscita)
+// il voto in corso: quello della settimana dopo appena arriva il suo lunedì
+function votoAttivo(now) {
+  const p = DATI.prossimo;
+  return p && p.voto && now >= new Date(p.dal) ? p.voto : DATI.voto;
+}
 function regaloSettimana() {
-  const u = +new Date(DATI.voto.uscita);
+  const u = +new Date(votoAttivo(new Date()).uscita);
   return DATI.prodotti.find(p => p.esce && +new Date(p.esce) === u) || null;
 }
 
 let uscitoGia = null;
 function render() {
-  const now = new Date(), V = DATI.voto, uscita = new Date(V.uscita), chiuso = now >= new Date(V.chiude);
+  const now = new Date(), V = votoAttivo(now), uscita = new Date(V.uscita), chiuso = now >= new Date(V.chiude);
   $("giorno-label").textContent = "Giorno " + giornoCorrente(now);
   $("link-tiktok").href = DATI.linkTikTok;
   $("data-scontrino").textContent = now.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Rome" });
@@ -343,12 +366,13 @@ function render() {
     if (esterno(fresco.link)) { cta.target = "_blank"; cta.rel = "noopener"; } else { cta.removeAttribute("target"); }
   }
 
-  $("diario").innerHTML = DATI.diario.map(e =>
+  const extra = DATI.prossimo && now >= new Date(DATI.prossimo.dal) ? (DATI.prossimo.diario || []) : [];
+  $("diario").innerHTML = extra.concat(DATI.diario).map(e =>
     `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${esc(e.titolo)}</b><span>${esc(e.testo)}</span></div></li>`).join("");
 }
 
 function tick() {
-  let ms = new Date(DATI.voto.uscita) - new Date();
+  let ms = new Date(votoAttivo(new Date()).uscita) - new Date();
   if (ms <= 0) { if (!uscitoGia) render(); ms = 0; }
   const g = Math.floor(ms / 864e5); ms -= g * 864e5;
   const h = Math.floor(ms / 36e5); ms -= h * 36e5;

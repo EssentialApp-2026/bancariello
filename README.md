@@ -22,6 +22,9 @@ Tutto sta in un unico file, `index.html`, senza dipendenze. I dati sono nel bloc
 - **Venerdì alle 19**: il regalo si apre da solo. Fino a quell'ora sul banco si vede «In arrivo» con l'orario; dopo, il bottone «Apri» e, in alto, «Apri il regalo».
 - Ogni puntata importante va nel `diario`.
 
+### La settimana dopo, in anticipo
+`DATI.prossimo` = `{ dal, voto, diario }`: da `dal` (il lunedì a mezzanotte) la pagina usa quel voto e aggiunge quelle righe al diario, da sola. Il lunedì poi si sposta tutto in `voto` e `diario` e si svuota `prossimo`.
+
 ### I regali
 Ogni regalo è una cartella `regali/<nome>/` con `index.html` (tutta l'app in un file), `manifest.webmanifest`, `sw.js` e le icone: si apre dal telefono, si può aggiungere alla schermata Home e dopo la prima apertura funziona anche senza rete. Niente registrazione, niente pubblicità, i dati restano sul telefono.
 
