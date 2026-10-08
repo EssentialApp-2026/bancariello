@@ -1,0 +1,15 @@
+{
+  "name": "Lista della spesa · Gennarino",
+  "short_name": "Spesa",
+  "description": "La lista della spesa che si scrive con la voce. Un regalo di Gennarino, 'O Bancariello.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbf3e2",
+  "theme_color": "#171a33",
+  "icons": [
+    { "src": "icona-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icona-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

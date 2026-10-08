@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lista della spesa · Gennarino</title>
+<meta name="description" content="La lista della spesa che si scrive con la voce. Il regalo di Gennarino, 'O Bancariello: gratis, senza registrazione e senza pubblicità.">
+<meta name="theme-color" content="#171a33">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icona-192.png">
+<link rel="apple-touch-icon" href="icona-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Spesa">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&display=swap">
+<style>
+/* Un foglietto della spesa sotto la tenda della bancarella: carta crema, inchiostro scuro, pomodoro per l'azione, verde LED quando Gennarino ascolta. */
+:root{
+  --notte:#171a33; --carta:#fbf3e2; --carta-2:#f3e8d0; --riga:#e2d5b8;
+  --inchiostro:#2a2230; --tenue:#7a6f63; --pomodoro:#e63946; --pomodoro-scuro:#b02a35;
+  --led:#1aa88c; --led-chiaro:#4ff0d0; --ok:#1d7a55;
+  --display:"Bungee","Arial Black",Impact,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--carta:#1d2140;--carta-2:#262b52;--riga:#363b6b;--inchiostro:#eef0ff;--tenue:#a9aed6;--led:#4ff0d0;--ok:#57d39a;color-scheme:dark}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--carta);color:var(--inchiostro);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100dvh;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit}
+.tenda{height:34px;background:repeating-linear-gradient(90deg,var(--pomodoro) 0 44px,#fbf3e2 44px 88px);position:relative}
+.tenda::after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:14px;
+  background:radial-gradient(circle at 22px 0,var(--pomodoro) 21px,transparent 22px) 0 0/88px 14px repeat-x,
+             radial-gradient(circle at 66px 0,#fbf3e2 21px,transparent 22px) 0 0/88px 14px repeat-x}
+main{max-width:520px;margin:0 auto;padding:30px 16px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+p{margin:0}
+header > div{min-width:0}
+header{display:flex;gap:14px;align-items:center}
+header svg{flex:0 0 64px;width:64px;height:auto}
+header h1{font-family:var(--display);font-weight:400;font-size:1.65rem;line-height:1.05;margin:0}
+header p{margin:2px 0 0;color:var(--tenue);font-size:.92rem}
+
+/* microfono */
+.voce{display:grid;justify-items:center;gap:12px;padding:8px 0 4px}
+.mic{width:132px;height:132px;border-radius:50%;border:0;background:var(--pomodoro);color:#fff;cursor:pointer;display:grid;place-items:center;
+  box-shadow:0 10px 0 var(--pomodoro-scuro),0 14px 26px rgba(176,42,53,.35);transition:transform .08s,box-shadow .08s;position:relative;touch-action:manipulation}
+.mic:active{transform:translateY(6px);box-shadow:0 4px 0 var(--pomodoro-scuro),0 6px 12px rgba(176,42,53,.3)}
+.mic svg{width:54px;height:54px}
+.mic.ascolta{background:var(--led);box-shadow:0 10px 0 #0e6e5c,0 0 0 0 rgba(79,240,208,.6);animation:onda 1.3s infinite}
+@keyframes onda{0%{box-shadow:0 10px 0 #0e6e5c,0 0 0 0 rgba(79,240,208,.55)}100%{box-shadow:0 10px 0 #0e6e5c,0 0 0 26px rgba(79,240,208,0)}}
+.stato{font-weight:800;font-size:1.05rem;text-align:center;min-height:1.5em}
+.sentito:empty{display:none}
+.sentito{text-align:center;color:var(--tenue);font-style:italic;max-width:34ch}
+.esempio{font-size:.9rem;color:var(--tenue);text-align:center;max-width:36ch}
+.esempio b{color:var(--inchiostro);font-weight:600}
+
+/* scrivi */
+.scrivi{display:flex;gap:8px}
+.scrivi input{flex:1;min-width:0;height:50px;border-radius:14px;border:2px solid var(--riga);background:var(--carta-2);color:var(--inchiostro);padding:0 14px;font:inherit}
+.scrivi input:focus{outline:none;border-color:var(--led)}
+.scrivi button{height:50px;min-width:50px;padding:0 16px;border-radius:14px;border:0;background:var(--inchiostro);color:var(--carta);font-weight:800;cursor:pointer}
+
+/* lista */
+.lista{display:grid;gap:18px}
+.reparto h2{font-family:var(--display);font-weight:400;font-size:.95rem;letter-spacing:.04em;margin:0 0 6px;display:flex;justify-content:space-between;color:var(--pomodoro)}
+.reparto h2 small{font-family:var(--body);font-size:.8rem;color:var(--tenue);font-weight:600}
+.reparto ul{list-style:none;margin:0;padding:0;border-top:2px dashed var(--riga)}
+.voce-lista{display:flex;align-items:center;gap:10px;border-bottom:2px dashed var(--riga);min-height:56px}
+.spunta{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:0;padding:10px 0;text-align:left;cursor:pointer}
+.cerchio{flex:0 0 28px;height:28px;border-radius:50%;border:2.5px solid var(--tenue);display:grid;place-items:center}
+.cerchio svg{width:16px;height:16px;opacity:0}
+.nome{min-width:0;overflow-wrap:anywhere;font-size:1.08rem}
+.qta{flex:0 0 auto;font-weight:800;font-size:.85rem;background:var(--carta-2);border:1.5px solid var(--riga);border-radius:999px;padding:2px 10px;font-variant-numeric:tabular-nums}
+.preso .cerchio{background:var(--ok);border-color:var(--ok)}
+.preso .cerchio svg{opacity:1}
+.preso .nome{text-decoration:line-through;color:var(--tenue)}
+.preso .qta{opacity:.5}
+.togli{flex:0 0 44px;height:44px;border:0;background:none;border-radius:12px;color:var(--tenue);cursor:pointer;display:grid;place-items:center}
+.togli svg{width:20px;height:20px}
+.vuota{text-align:center;color:var(--tenue);padding:18px 8px;border:2px dashed var(--riga);border-radius:16px}
+.vuota b{display:block;color:var(--inchiostro);font-size:1.05rem;margin-bottom:4px}
+
+/* barra in basso */
+.azioni{position:fixed;left:0;right:0;bottom:0;background:var(--notte);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:5}
+.azioni div{max-width:520px;margin:0 auto;display:flex;gap:8px}
+.azioni button{flex:1;min-height:50px;border-radius:999px;border:2px solid #363b6b;background:transparent;color:#eef0ff;font-weight:800;font-size:.95rem;cursor:pointer;padding:0 8px}
+.azioni button.primario{background:#4ff0d0;border-color:#4ff0d0;color:#14202a}
+.azioni button.conferma{background:var(--pomodoro);border-color:var(--pomodoro)}
+.azioni button:disabled{opacity:.4}
+
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--inchiostro);color:var(--carta);border-radius:14px;padding:12px 14px 12px 16px;display:flex;gap:14px;align-items:center;
+  width:max-content;max-width:calc(100vw - 32px);transition:.2s;z-index:6;font-size:.95rem}
+.toast.su{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:var(--led-chiaro);font-weight:800;cursor:pointer;padding:6px}
+.installa{display:none;justify-self:center;background:none;border:2px solid var(--riga);border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}
+.installa.si{display:block}
+footer{text-align:center;color:var(--tenue);font-size:.82rem;padding:26px 16px 10px}
+footer a{color:var(--tenue)}
+:focus-visible{outline:3px solid var(--led);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="tenda" aria-hidden="true"></div>
+<main>
+  <header>
+    <svg viewBox="0 0 120 130" aria-hidden="true">
+      <line x1="60" y1="6" x2="60" y2="22" stroke="#a9aed6" stroke-width="4"/>
+      <circle cx="60" cy="8" r="7" fill="#e63946"/>
+      <rect x="10" y="20" width="100" height="66" rx="20" fill="#e8edf5"/>
+      <rect x="18" y="27" width="84" height="52" rx="14" fill="#0e1824"/>
+      <rect x="2" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <rect x="108" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <path d="M33 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M69 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="51" y="62" width="18" height="6" rx="3" fill="#4ff0d0"/>
+      <rect x="24" y="92" width="72" height="38" rx="14" fill="#ced6e2"/>
+      <rect x="38" y="100" width="44" height="16" rx="5" fill="#28344a"/>
+      <circle cx="47" cy="108" r="3" fill="#4ff0d0"/><circle cx="56" cy="108" r="3" fill="#4ff0d0"/><circle cx="65" cy="108" r="3" fill="#4ff0d0"/><circle cx="74" cy="108" r="3" fill="#1e5a5a"/>
+    </svg>
+    <div>
+      <h1>Lista della spesa</h1>
+      <p>La scrivi con la voce. Un regalo di Gennarino.</p>
+    </div>
+  </header>
+
+  <section class="voce" aria-label="Detta la spesa">
+    <button class="mic" id="mic" aria-label="Tocca e parla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/>
+      </svg>
+    </button>
+    <p class="stato" id="stato" aria-live="polite">Tocca e parla</p>
+    <p class="sentito" id="sentito" aria-live="polite"></p>
+    <p class="esempio" id="esempio">Prova a dire: <b>«due chili di patate, il latte e sei uova»</b>.<br>Per togliere: <b>«togli il latte»</b>.</p>
+  </section>
+
+  <form class="scrivi" id="scrivi" autocomplete="off">
+    <label class="sr" for="testo">Scrivi cosa ti serve</label>
+    <input id="testo" placeholder="Oppure scrivi qui…" enterkeyhint="done">
+    <button type="submit" aria-label="Aggiungi">Aggiungi</button>
+  </form>
+
+  <section class="lista" id="lista" aria-label="La tua lista"></section>
+  <button class="installa" id="installa">Metti l'app sul telefono</button>
+</main>
+<footer>Gratis, senza registrazione e senza pubblicità. La lista resta solo sul tuo telefono.<br>
+  <a href="../">'O Bancariello</a> · <a href="https://www.tiktok.com/@bancariello.gennarino" target="_blank" rel="noopener">Gennarino su TikTok</a></footer>
+
+<nav class="azioni" aria-label="Azioni">
+  <div>
+    <button class="primario" id="condividi">Condividi</button>
+    <button id="pulisci">Togli i presi</button>
+    <button id="svuota">Svuota</button>
+  </div>
+</nav>
+<div class="toast" id="toast" role="status"><span id="toast-testo"></span><button id="annulla">Annulla</button></div>
+
+<script>
+"use strict";
+/* ---------- dizionario: reparti in ordine di supermercato ---------- */
+const REPARTI = [
+  ["Frutta e verdura", "mela mele pera pere banan aranc limon mandarin clementin uva frag kiwi pesca pesche albicocc ciliegi anguri melone ananas mirtill lampon prugn fico fichi castagn pomodor pummarol pomodorin insalat lattug rucol radicchi patate patata cipoll aglio carot zucchin zucca melanzan peperon finocch broccol cavol cavolfior friariell scarol spinac bietol sedano prezzemol basilic funghi fagiolini carciof asparag porri verdur frutta avocado zenzero"],
+  ["Pane e pasta", "pane panin panett pasta spaghett vermicell penne rigatoni fusilli paccheri linguine ziti candele mezze maniche tortellini gnocchi lasagne riso farina fette biscottate grissin taralli crackers cracker pizza focacc friselle pangrattato piadin"],
+  ["Carne e pesce", "carne pollo petto cosce macinat salsicc bistecc fettin braciol polpett prosciutt salame mortadell wurstel tacchino maiale manzo vitell agnello coniglio pesce salmon alici acciugh vongol cozze gamber calamar seppi polp baccal merluzz orata spigol pancett guanciale speck bresaola cotoletta hamburger"],
+  ["Latticini e uova", "latte mozzarell fior di latte provol formagg parmigian grana ricott burro yogurt panna uova uovo scamorz stracchin burrat pecorino mascarpone caciocaval emmental fontina sottilette"],
+  ["Dispensa", "olio aceto sale zucchero caffè caffe cialde capsule tè tisan camomill biscott nutella marmellat confettur miele passata pelati concentrato legumi fagioli ceci lenticchie piselli tonno sugo ragù cereali merendin cioccolat patatine lievito brodo dado spezie pepe origano peperoncino olive capperi maionese ketchup senape cornetti crostatin snack noci mandorl"],
+  ["Bevande", "acqua vino birra succo succhi aranciata coca cola bibit spremuta tè freddo the freddo energy gassosa limonata"],
+  ["Casa e igiene", "detersiv sapone shampoo balsamo bagnoschiuma docciaschiuma dentifric spazzolin carta igienica scottex carta assorbente rotoli tovaglioli piatti bicchieri posate sacchetti spazzatura spugn candeggin varechina ammorbident pannolin salviett assorbent deodorant rasoi cotton alluminio pellicola lampadin pile ricarica crema"],
+];
+const ALTRO = "Altro";
+const ORDINE = [...REPARTI.map(r => r[0]), ALTRO];
+
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[’`]/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
+
+// parole chiave ordinate dalla più lunga: "patatine" vince su "patate", "carta igienica" su "carta"
+const PAROLE = (() => {
+  const v = [];
+  for (const [rep, lista] of REPARTI) {
+    // le frasi di più parole stanno nella stringa come coppie note
+    const multi = ["fior di latte", "fette biscottate", "carta igienica", "carta assorbente", "mezze maniche", "tè freddo", "the freddo", "coca cola"];
+    let s = " " + lista + " ";
+    for (const m of multi) if (s.includes(" " + m + " ")) { v.push([norm(m), rep]); s = s.replace(" " + m + " ", " "); }
+    for (const p of s.trim().split(" ")) if (p) v.push([norm(p), rep]);
+  }
+  return v.sort((a, b) => b[0].length - a[0].length);
+})();
+
+function trovaParola(parole, i) {
+  // ritorna [lunghezza in parole, reparto] se alla posizione i comincia un prodotto noto
+  for (const [k, rep] of PAROLE) {
+    const kp = k.split(" ");
+    if (i + kp.length > parole.length) continue;
+    let ok = true;
+    for (let j = 0; j < kp.length; j++) {
+      const w = parole[i + j], q = kp[j];
+      const ultimo = j === kp.length - 1;
+      if (ultimo && q.length > 3 ? !w.startsWith(q) : w !== q) { ok = false; break; }
+    }
+    if (ok) return [kp.length, rep];
+  }
+  return null;
+}
+function reparto(nome) {
+  const p = norm(nome).split(" ");
+  for (let i = 0; i < p.length; i++) { const t = trovaParola(p, i); if (t) return t[1]; }
+  return ALTRO;
+}
+
+/* ---------- quantità ---------- */
+const NUMERI = { un: 1, uno: 1, una: 1, "un'": 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10,
+  undici: 11, dodici: 12, quindici: 15, venti: 20, trenta: 30, mezzo: 0.5, mezza: 0.5, paio: 2 };
+const UNITA = { chilo: "kg", chili: "kg", kg: "kg", chilogrammi: "kg", chilogrammo: "kg", kili: "kg", kilo: "kg",
+  etto: "etto|etti", etti: "etto|etti", grammi: "g", grammo: "g", gr: "g", g: "g", litro: "l", litri: "l", l: "l",
+  pacco: "pacco|pacchi", pacchi: "pacco|pacchi", pacchetto: "pacco|pacchi", pacchetti: "pacco|pacchi", confezione: "conf.", confezioni: "conf.",
+  bottiglia: "bottiglia|bottiglie", bottiglie: "bottiglia|bottiglie", scatola: "scatola|scatole", scatole: "scatola|scatole",
+  scatoletta: "scatoletta|scatolette", scatolette: "scatoletta|scatolette", vasetto: "vasetto|vasetti", vasetti: "vasetto|vasetti",
+  barattolo: "barattolo|barattoli", barattoli: "barattolo|barattoli", lattina: "lattina|lattine", lattine: "lattina|lattine",
+  busta: "busta|buste", buste: "busta|buste", rotolo: "rotolo|rotoli", rotoli: "rotolo|rotoli", cassa: "cassa|casse", casse: "cassa|casse",
+  fetta: "fetta|fette", fette: "fetta|fette" };
+const ARTICOLI = new Set(["il", "lo", "la", "i", "gli", "le", "l'", "del", "dello", "della", "dei", "degli", "delle", "dell'", "di", "d'", "po'", "po", "qualche", "anche", "ancora", "poi", "pure", "e", "ed", "per", "mi", "serve", "servono", "compra", "comprare", "prendi", "prendere", "aggiungi", "metti"]);
+const ARTICOLO_INIZIO = new Set(["il", "lo", "la", "i", "gli", "le", "l'", "un", "uno", "una", "un'", "del", "dello", "della", "dei", "degli", "delle", "dell'", "qualche"]);
+const SEPARATORI = new Set(["e", "ed", "poi", "anche", "pure", "più", "piu", "inoltre"]);
+
+function numero(w) {
+  if (/^\d+([.,]\d+)?$/.test(w)) return parseFloat(w.replace(",", "."));
+  return w in NUMERI ? NUMERI[w] : null;
+}
+function fmtQ(n) { return n === 0.5 ? "½" : String(n).replace(".", ","); }
+
+// "due chili di patate" -> {nome:"Patate", q:2, u:"kg"}
+function leggiVoce(testo) {
+  let p = testo.replace(/'/g, "' ").split(/\s+/).map(w => w.trim()).filter(Boolean);
+  let q = null, u = null, i = 0;
+  // "un po' di", articoli iniziali
+  while (i < p.length && ARTICOLI.has(norm(p[i]) || p[i]) && numero(norm(p[i])) === null) i++;
+  const n = i < p.length ? numero(norm(p[i]).replace("'", "")) : null;
+  if (n !== null) {
+    q = n; i++;
+    if (norm(p[i] || "") === "paio") { q = 2; i++; }
+    if (norm(p[i] || "") === "e" && norm(p[i + 1] || "") === "mezzo") { q += 0.5; i += 2; }
+    const un = UNITA[norm(p[i] || "")];
+    if (un) { u = un; i++; }
+    if (norm(p[i] || "") === "e" && norm(p[i + 1] || "") === "mezzo") { q += 0.5; i += 2; }
+  }
+  while (i < p.length && ARTICOLI.has(norm(p[i]) || p[i])) i++;
+  let nome = p.slice(i).join(" ").replace(/' /g, "'").trim();
+  if (!nome) return null;
+  nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+  return { nome, q, u };
+}
+
+// divide una frase detta senza virgole: "pane latte uova e due mozzarelle"
+function dividi(frase) {
+  const pezzi = [];
+  for (const parte of frase.split(/[,;.\n]+/)) {
+    const parole = parte.replace(/['’]/g, "' ").trim().split(/\s+/).filter(Boolean);
+    let cur = [], haProdotto = false;
+    const chiudi = () => { if (cur.length) pezzi.push(cur.join(" ")); cur = []; haProdotto = false; };
+    for (let i = 0; i < parole.length; i++) {
+      const w = norm(parole[i]);
+      if (SEPARATORI.has(w) && cur.length) {
+        // "un chilo e mezzo": la "e" non separa
+        if (norm(parole[i + 1] || "") === "mezzo") { cur.push(parole[i]); continue; }
+        chiudi(); continue;
+      }
+      const t = trovaParola(parole.map(norm), i);
+      const eNumero = numero(w.replace("'", "")) !== null || /^\d/.test(w);
+      const LEGA = ["di", "d'", "al", "alla", "allo", "ai", "alle", "con", "per", "da", "in", "senza"];
+      const legato = LEGA.includes(norm(cur[cur.length - 1] || "")) || (ARTICOLO_INIZIO.has(norm(cur[cur.length - 1] || "")) && LEGA.includes(norm(cur[cur.length - 2] || "")));
+      if (haProdotto && !legato && (t || eNumero || ARTICOLO_INIZIO.has(w))) chiudi();
+      if (t) { for (let k = 0; k < t[0]; k++) cur.push(parole[i + k]); i += t[0] - 1; haProdotto = true; }
+      else cur.push(parole[i]);
+    }
+    chiudi();
+  }
+  return pezzi;
+}
+
+/* ---------- stato ---------- */
+const CHIAVE = "gennarino-spesa-v1";
+let lista = [];
+try { lista = JSON.parse(localStorage.getItem(CHIAVE) || "[]"); if (!Array.isArray(lista)) lista = []; } catch (e) { lista = []; }
+const salva = () => { try { localStorage.setItem(CHIAVE, JSON.stringify(lista)); } catch (e) {} };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+function aggiungi(testo) {
+  const aggiunti = [], tolti = [], presi = [];
+  let modo = "aggiungi";
+  for (let pezzo of dividi(testo)) {
+    const w0 = norm(pezzo).split(" ")[0];
+    if (["togli", "rimuovi", "cancella", "leva", "elimina", "levami", "toglimi", "togliete"].includes(w0)) { modo = "togli"; pezzo = pezzo.split(/\s+/).slice(1).join(" "); }
+    else if (/^(ho preso|preso|presi|presa|prese)\b/.test(norm(pezzo))) { modo = "preso"; pezzo = norm(pezzo).replace(/^(ho preso|preso|presi|presa|prese)/, ""); }
+    else if (/^(aggiungi|metti|poi|e poi)\b/.test(norm(pezzo))) modo = "aggiungi";
+    const resto = pezzo;
+    if (modo === "togli") {
+      const v = leggiVoce(resto); if (!v) continue;
+      const k = norm(v.nome);
+      const idx = lista.findIndex(x => norm(x.nome).includes(k) || k.includes(norm(x.nome)));
+      if (idx >= 0) tolti.push(lista.splice(idx, 1)[0]);
+      continue;
+    }
+    if (modo === "preso") {
+      const v = leggiVoce(resto); if (!v) continue;
+      const k = norm(v.nome);
+      const it = lista.find(x => !x.preso && (norm(x.nome).includes(k) || k.includes(norm(x.nome))));
+      if (it) { it.preso = true; presi.push(it); }
+      continue;
+    }
+    const v = leggiVoce(pezzo); if (!v) continue;
+    const gia = lista.find(x => !x.preso && norm(x.nome) === norm(v.nome));
+    if (gia) {
+      if (v.q !== null && gia.q !== null && gia.u === v.u) gia.q += v.q;
+      else if (v.q !== null) { gia.q = v.q; gia.u = v.u; }
+      aggiunti.push(gia);
+    } else {
+      const it = { id: uid(), nome: v.nome, q: v.q, u: v.u, preso: false, rep: reparto(v.nome) };
+      lista.push(it); aggiunti.push(it);
+    }
+  }
+  salva(); disegna();
+  return { aggiunti, tolti, presi };
+}
+
+/* ---------- interfaccia ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const SPUNTA = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const unita = (u, q) => !u ? "" : " " + (u.includes("|") ? u.split("|")[q > 1 ? 1 : 0] : u);
+const etichettaQ = it => it.q === null ? "" : fmtQ(it.q) + unita(it.u, it.q);
+
+function disegna() {
+  const el = $("lista");
+  if (!lista.length) {
+    el.innerHTML = `<div class="vuota"><b>Uè! La lista è vuota.</b>Tocca il pomodoro e dimmi cosa ti serve.</div>`;
+  } else {
+    const gruppi = ORDINE.map(r => [r, lista.filter(x => x.rep === r)]).filter(g => g[1].length);
+    el.innerHTML = gruppi.map(([r, voci]) => {
+      const fatti = voci.filter(v => v.preso).length;
+      const ord = [...voci.filter(v => !v.preso), ...voci.filter(v => v.preso)];
+      return `<div class="reparto"><h2>${r}<small>${fatti}/${voci.length}</small></h2><ul>${ord.map(it => `
+        <li class="voce-lista${it.preso ? " preso" : ""}">
+          <button class="spunta" data-id="${it.id}" aria-pressed="${it.preso}">
+            <span class="cerchio">${SPUNTA}</span><span class="nome">${esc(it.nome)}</span>
+            ${etichettaQ(it) ? `<span class="qta">${esc(etichettaQ(it))}</span>` : ""}
+          </button>
+          <button class="togli" data-togli="${it.id}" aria-label="Togli ${esc(it.nome)}">${X}</button>
+        </li>`).join("")}</ul></div>`;
+    }).join("");
+  }
+  const presi = lista.filter(x => x.preso).length;
+  $("pulisci").disabled = !presi;
+  $("svuota").disabled = $("condividi").disabled = !lista.length;
+}
+
+let ultimoTolto = null, timerToast;
+function toast(msg, annullabile) {
+  $("toast-testo").textContent = msg;
+  $("annulla").style.display = annullabile ? "" : "none";
+  $("toast").classList.add("su");
+  clearTimeout(timerToast); timerToast = setTimeout(() => $("toast").classList.remove("su"), 4200);
+}
+$("annulla").onclick = () => {
+  if (ultimoTolto) { lista = ultimoTolto; ultimoTolto = null; salva(); disegna(); }
+  $("toast").classList.remove("su");
+};
+
+$("lista").addEventListener("click", e => {
+  const s = e.target.closest("[data-id]"), t = e.target.closest("[data-togli]");
+  if (t) {
+    ultimoTolto = lista.map(x => ({ ...x }));
+    const it = lista.find(x => x.id === t.dataset.togli);
+    lista = lista.filter(x => x.id !== t.dataset.togli); salva(); disegna();
+    toast(`Tolto: ${it ? it.nome : ""}`, true);
+  } else if (s) {
+    const it = lista.find(x => x.id === s.dataset.id);
+    if (it) { it.preso = !it.preso; salva(); disegna(); if (navigator.vibrate) navigator.vibrate(12); }
+  }
+});
+
+$("scrivi").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = $("testo").value.trim(); if (!v) return;
+  const r = aggiungi(v); $("testo").value = "";
+  riepilogo(r);
+});
+
+function riepilogo(r) {
+  const parti = [];
+  if (r.aggiunti.length) parti.push("Aggiunto: " + r.aggiunti.map(x => x.nome.toLowerCase()).join(", "));
+  if (r.tolti.length) parti.push("Tolto: " + r.tolti.map(x => x.nome.toLowerCase()).join(", "));
+  if (r.presi.length) parti.push("Preso: " + r.presi.map(x => x.nome.toLowerCase()).join(", "));
+  if (parti.length) toast(parti.join(" · "), false);
+  return parti.length;
+}
+
+$("pulisci").onclick = () => {
+  ultimoTolto = lista.map(x => ({ ...x }));
+  const n = lista.filter(x => x.preso).length;
+  lista = lista.filter(x => !x.preso); salva(); disegna();
+  toast(`Tolti ${n} prodotti presi`, true);
+};
+let confermaSvuota = null;
+$("svuota").onclick = () => {
+  const b = $("svuota");
+  if (!confermaSvuota) {
+    b.textContent = "Sicuro?"; b.classList.add("conferma");
+    confermaSvuota = setTimeout(() => { b.textContent = "Svuota"; b.classList.remove("conferma"); confermaSvuota = null; }, 3000);
+    return;
+  }
+  clearTimeout(confermaSvuota); confermaSvuota = null; b.textContent = "Svuota"; b.classList.remove("conferma");
+  ultimoTolto = lista.map(x => ({ ...x })); lista = []; salva(); disegna();
+  toast("Lista svuotata", true);
+};
+
+function testoLista() {
+  const righe = ["🛒 Lista della spesa", ""];
+  for (const r of ORDINE) {
+    const v = lista.filter(x => x.rep === r && !x.preso); if (!v.length) continue;
+    righe.push(r.toUpperCase());
+    for (const it of v) righe.push("• " + it.nome + (etichettaQ(it) ? " (" + etichettaQ(it) + ")" : ""));
+    righe.push("");
+  }
+  righe.push("Fatta con la voce, gratis: essentialapp-2026.github.io/bancariello/spesa");
+  return righe.join("\n");
+}
+$("condividi").onclick = async () => {
+  const t = testoLista();
+  if (navigator.share) { try { await navigator.share({ text: t }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  location.href = "https://wa.me/?text=" + encodeURIComponent(t);
+};
+
+/* ---------- voce ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, ascolto = false, finale = "";
+function statoMic(on, msg) {
+  ascolto = on; $("mic").classList.toggle("ascolta", on);
+  $("mic").setAttribute("aria-label", on ? "Smetti di ascoltare" : "Tocca e parla");
+  $("stato").textContent = msg || (on ? "Ti ascolto…" : "Tocca e parla");
+}
+if (!SR) {
+  $("stato").textContent = "Il microfono qui non va";
+  $("esempio").innerHTML = "Questo browser non riconosce la voce. Apri la pagina con <b>Chrome</b> oppure scrivi qui sotto: puoi anche usare il microfono della tastiera.";
+  $("mic").addEventListener("click", () => $("testo").focus());
+} else {
+  $("mic").addEventListener("click", () => {
+    if (ascolto && rec) { rec.stop(); return; }
+    rec = new SR(); rec.lang = "it-IT"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+    finale = ""; $("sentito").textContent = "";
+    rec.onstart = () => statoMic(true);
+    rec.onresult = ev => {
+      let prov = "";
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        if (ev.results[i].isFinal) finale += ev.results[i][0].transcript + " ";
+        else prov += ev.results[i][0].transcript;
+      }
+      $("sentito").textContent = "«" + (finale + prov).trim() + "»";
+    };
+    rec.onerror = ev => {
+      const m = { "not-allowed": "Serve il permesso del microfono", "service-not-allowed": "Serve il permesso del microfono",
+        "no-speech": "Non ho sentito niente, riprova", "network": "Senza internet la voce non va: scrivi qui sotto", "audio-capture": "Non trovo il microfono" }[ev.error];
+      statoMic(false, m || "Riprova"); finale = "";
+      if (ev.error === "not-allowed") $("esempio").innerHTML = "Tocca il lucchetto accanto all'indirizzo e consenti il <b>microfono</b>, poi riprova.";
+    };
+    rec.onend = () => {
+      const t = finale.trim();
+      if (t) {
+        const n = riepilogo(aggiungi(t));
+        statoMic(false, n ? "Fatto! Tocca per aggiungere altro" : "Non ho capito, riprova");
+      } else if (ascolto) statoMic(false);
+    };
+    try { rec.start(); } catch (e) { statoMic(false, "Riprova"); }
+  });
+}
+
+/* ---------- installazione e offline ---------- */
+let invito = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); invito = e; $("installa").classList.add("si"); });
+$("installa").onclick = async () => { if (!invito) return; invito.prompt(); await invito.userChoice; invito = null; $("installa").classList.remove("si"); };
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+
+disegna();
+window.__test = { dividi, leggiVoce, reparto, aggiungi, get lista() { return lista; } };
+</script>
+</body>
+</html>
