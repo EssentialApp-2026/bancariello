@@ -241,20 +241,20 @@ const DATI = {
   ],
   // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
   prossimo: {
-    dal: "2026-10-12T00:00:00+02:00",
+    dal: "2026-10-11T00:00:00+02:00",
     voto: {
       chiude: "2026-10-14T23:59:00+02:00",
       uscita: "2026-10-16T19:00:00+02:00",
       conteggio: "",
       vince: "",
       opzioni: [
-        { lettera: "A", idea: "'A munnezza 'e stasera", voti: 0 },
-        { lettera: "B", idea: "Addò aggio parcheggiato?", voti: 0 },
-        { lettera: "C", idea: "'E punte d' 'a scopa", voti: 0 },
+        { lettera: "A", idea: "Promemoria della differenziata", voti: 0 },
+        { lettera: "B", idea: "Dove ho parcheggiato", voti: 0 },
+        { lettera: "C", idea: "Dove sono le fontanelle", voti: 0 },
       ],
     },
     diario: [
-      { giorno: 10, titolo: "Tre idee nuove sul banco", testo: "La differenziata, il parcheggio e la scopa: si vota nei commenti fino a mercoledì." },
+      { giorno: 9, titolo: "Piazza nuova, tre idee nuove", testo: "La differenziata, il parcheggio e le fontanelle: si vota nei commenti fino a mercoledì." },
     ],
   },
   diario: [
@@ -280,7 +280,7 @@ function giornoCorrente(now) {
   return Math.max(1, Math.floor((now - new Date(DATI.inizio)) / 864e5) + 1);
 }
 // il regalo legato al voto di questa settimana (esce all'ora dell'uscita)
-// il voto in corso: quello della settimana dopo appena arriva il suo lunedì
+// il voto in corso: quello della settimana dopo appena arriva la sua domenica
 function votoAttivo(now) {
   const p = DATI.prossimo;
   return p && p.voto && now >= new Date(p.dal) ? p.voto : DATI.voto;
@@ -311,9 +311,9 @@ function render() {
   $("live").textContent = zero ? "VOTO CHIUSO · NESSUN VOTO" : chiuso ? (vince ? "VOTO CHIUSO · HA VINTO LA " + vince : "VOTO CHIUSO · STO CONTANDO")
     : V.conteggio ? "CONTEGGIO DI " + dataBreve(new Date(V.conteggio)).toUpperCase() : "PRIMO CONTEGGIO IN ARRIVO";
   $("come-votare").textContent = zero
-    ? "Questa settimana nei commenti non ha votato nessuno, quindi niente app. Lunedì arrivano tre idee nuove: basta una lettera nei commenti per decidere."
+    ? "Questa settimana nei commenti non ha votato nessuno, quindi niente app. Domenica arrivano tre idee nuove: basta una lettera nei commenti per decidere."
     : chiuso
-    ? "Il voto di questa settimana è chiuso. Lunedì arrivano tre idee nuove: tieni d'occhio TikTok."
+    ? "Il voto di questa settimana è chiuso. Domenica arrivano tre idee nuove: tieni d'occhio TikTok."
     : "Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a " + dataBreve(new Date(V.chiude)) + " sera.";
 
   // il conto alla rovescia, oppure il regalo già uscito
@@ -323,7 +323,7 @@ function render() {
   $("uscito").hidden = !uscito && !zero;
   if (zero) {
     $("cd-label").textContent = "Voto chiuso";
-    $("uscito").innerHTML = `<b>😔 Questa settimana niente regalo</b><p class="lede">Nei commenti non ha votato nessuno, e le app le scegliete voi. Lunedì tre idee nuove.</p><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Seguimi su TikTok</a>`;
+    $("uscito").innerHTML = `<b>😔 Questa settimana niente regalo</b><p class="lede">Nei commenti non ha votato nessuno, e le app le scegliete voi. Domenica tre idee nuove.</p><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Seguimi su TikTok</a>`;
   } else if (uscito) {
     $("cd-label").textContent = "Venerdì " + uscita.toLocaleDateString("it-IT", { day: "numeric", month: "long", timeZone: "Europe/Rome" });
     $("uscito").innerHTML = reg
@@ -351,7 +351,7 @@ function render() {
   const attesa = zero ? `
     <article class="prodotto vuoto">
       <h3>Questa settimana il banco resta vuoto</h3>
-      <p>Nessuno ha votato, quindi niente app. Lunedì tre idee nuove: vota con una lettera nei commenti.</p>
+      <p>Nessuno ha votato, quindi niente app. Domenica tre idee nuove: vota con una lettera nei commenti.</p>
       <div class="piede"><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Vota su TikTok</a></div>
     </article>` : !reg && !uscito ? `
     <article class="prodotto vuoto">

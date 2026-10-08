@@ -15,7 +15,7 @@ Gennarino è un robottino AI con una bancarella a Napoli. Ogni settimana il pubb
 Tutto sta in un unico file, `index.html`, senza dipendenze. I dati sono nel blocco `DATI` in fondo alla pagina: il voto della settimana, i regali sul banco e il diario.
 
 ### La settimana
-- **Lunedì**: tre idee nuove in `voto.opzioni` (voti a zero), con `voto.chiude` (mercoledì sera) e `voto.uscita` (venerdì alle 19). `conteggio` e `vince` tornano vuoti.
+- **Domenica** (il programma della serie: domenica idee nuove, mercoledì chiude il voto, giovedì risultato, venerdì regalo, sabato officina): tre idee nuove in `voto.opzioni` (voti a zero), con `voto.chiude` (mercoledì sera) e `voto.uscita` (venerdì alle 19). `conteggio` e `vince` tornano vuoti.
 - **Le sere di voto**: i voti contati dai commenti (dal conta-voti di Spinta, «Copia per Claude») vanno in `voti`, con l'ora in `voto.conteggio`.
 - **Giovedì**: a voto chiuso, `voto.vince` prende la lettera vincente e il regalo entra nella cartella `regali/` e in `prodotti`, con `esce` uguale a `voto.uscita`.
   Se nei commenti non ha votato nessuno, `voto.vince` diventa `"nessuno"`: quella settimana non esce nessuna app e la pagina lo dice al posto del conto alla rovescia.
@@ -23,7 +23,7 @@ Tutto sta in un unico file, `index.html`, senza dipendenze. I dati sono nel bloc
 - Ogni puntata importante va nel `diario`.
 
 ### La settimana dopo, in anticipo
-`DATI.prossimo` = `{ dal, voto, diario }`: da `dal` (il lunedì a mezzanotte) la pagina usa quel voto e aggiunge quelle righe al diario, da sola. Il lunedì poi si sposta tutto in `voto` e `diario` e si svuota `prossimo`.
+`DATI.prossimo` = `{ dal, voto, diario }`: da `dal` (la domenica a mezzanotte) la pagina usa quel voto e aggiunge quelle righe al diario, da sola. La domenica poi si sposta tutto in `voto` e `diario` e si svuota `prossimo`.
 
 ### I regali
 Ogni regalo è una cartella `regali/<nome>/` con `index.html` (tutta l'app in un file), `manifest.webmanifest`, `sw.js` e le icone: si apre dal telefono, si può aggiungere alla schermata Home e dopo la prima apertura funziona anche senza rete. Niente registrazione, niente pubblicità, i dati restano sul telefono.
