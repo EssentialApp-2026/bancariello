@@ -28,6 +28,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--notte);color:var(--testo);font-family:var(--body);font-size:17px;line-height:1.5;margin:0}
 .tenda{height:46px;background:repeating-linear-gradient(90deg,var(--pomodoro) 0 54px,var(--crema) 54px 108px);position:relative}
 .tenda::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;
@@ -119,7 +120,17 @@ p{margin:0}
 footer{font-family:var(--mono);font-size:.8rem;color:var(--tenue);text-align:center;padding-block:0 32px;padding-inline:16px}
 footer a{color:var(--tenue)}
 .sez{display:grid;gap:16px}
-[hidden]{display:none!important}
+.prodotto .badge{justify-self:start;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1c1a12;background:var(--led);border-radius:999px;padding:3px 10px}
+.prodotto.arrivo{border:2px dashed var(--pomodoro)}
+.prodotto.arrivo .badge{background:var(--pomodoro);color:var(--crema)}
+.prodotto.nuovo{border:2px solid var(--led)}
+.prodotto small{font-family:var(--mono);font-size:.78rem;color:var(--tenue)}
+.esce{font-family:var(--mono);font-size:.85rem;color:var(--crema)}
+.riga.vince b{color:#1d7a55}
+.riga em{font-style:normal;font-size:.72rem;letter-spacing:.08em;color:#1d7a55;white-space:nowrap}
+.uscito{display:grid;gap:12px;justify-items:start}
+.uscito b{font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--crema)}
+.uscito .lede{font-size:.98rem}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -150,6 +161,7 @@ footer a{color:var(--tenue)}
     </div>
     <p class="lede">Uè guagliù! Je so' <strong>Gennarino</strong>, un robottino con una bancarella a Napoli. Ogni settimana mi dite nei commenti cosa vi serve, e il <strong>venerdì</strong> l'app più votata la costruisco io e la metto sul banco, <strong>gratis per tutti</strong>.</p>
     <div class="cta">
+      <a class="btn" id="cta-regalo" href="#banco" hidden>Apri il regalo</a>
       <a class="btn" id="link-tiktok" href="https://www.tiktok.com/@bancariello.gennarino" target="_blank" rel="noopener">Seguimi su TikTok</a>
       <a class="btn secondario" href="#banco">Cosa c'è sul banco</a>
     </div>
@@ -157,19 +169,15 @@ footer a{color:var(--tenue)}
 
   <section class="sez affitto" aria-labelledby="t-voto">
     <h2 id="t-voto">Il voto della settimana</h2>
-    <div class="conto-alla-rovescia" id="cd-box">
+    <div class="conto-alla-rovescia">
       <p class="cd-label" id="cd-label">Il regalo esce tra</p>
-      <div class="cd" aria-live="off">
+      <div class="uscito" id="uscito" hidden></div>
+      <div class="cd" id="cd" aria-live="off">
         <div><b id="cd-g">0</b><small>giorni</small></div>
         <div><b id="cd-h">00</b><small>ore</small></div>
         <div><b id="cd-m">00</b><small>min</small></div>
         <div><b id="cd-s">00</b><small>sec</small></div>
       </div>
-    </div>
-    <div class="conto-alla-rovescia" id="uscito" hidden>
-      <p class="cd-label">Il regalo è uscito</p>
-      <p><b>Lista della spesa a voce</b>: gratis per tutti, la trovi sul banco.</p>
-      <div><a class="btn" href="spesa/">Apri il regalo</a></div>
     </div>
     <div class="scontrino">
       <div class="intest">
@@ -178,10 +186,10 @@ footer a{color:var(--tenue)}
         <span id="data-scontrino"></span>
       </div>
       <div class="righe" id="righe"></div>
-      <div class="totale"><span id="tot-label">VOTI TOTALI</span><b id="cassa">0</b></div>
-      <div class="live" id="live">AGGIORNATO OGNI SERA</div>
+      <div class="totale"><span>VOTI TOTALI</span><b id="cassa">0</b></div>
+      <div class="live" id="live">PRIMO CONTEGGIO IN ARRIVO</div>
     </div>
-    <p class="lede" id="voto-nota">Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a mercoledì sera.</p>
+    <p class="lede" id="come-votare">Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a mercoledì sera.</p>
   </section>
 
   <section class="sez banco" id="banco" aria-labelledby="t-banco">
@@ -208,28 +216,48 @@ footer a{color:var(--tenue)}
 
 <script>
 /* ============================================================
-   DATI: l'unica parte da aggiornare.
+   DATI: l'unica parte da aggiornare (lo fa Claude ogni settimana).
    Date con fuso orario di Roma.
    ============================================================ */
 const DATI = {
   inizio: "2026-10-03T00:00:00+02:00",      // giorno 1
   linkTikTok: "https://www.tiktok.com/@bancariello.gennarino",
-  // voto in corso: lettera, idea, voti contati dai commenti
+  // il voto della settimana: si vota fino a «chiude», il regalo esce a «uscita»
   voto: {
-    uscita: "2026-10-09T19:00:00+02:00",    // venerdì: esce il regalo
-    vincitore: "C",                          // lettera vincente (voti chiusi)
+    chiude: "2026-10-07T23:59:00+02:00",    // mercoledì sera
+    uscita: "2026-10-09T19:00:00+02:00",    // venerdì alle 19: esce il regalo
+    conteggio: "2026-10-08T17:50:00+02:00", // quando sono stati contati i voti dai commenti (vuoto: non ancora)
+    vince: "C",                             // la lettera vincente, a voto chiuso; "nessuno" se nei commenti non ha votato nessuno (niente app)
     opzioni: [
       { lettera: "A", idea: "Dividi il conto in pizzeria", voti: 0 },
       { lettera: "B", idea: "Timer per la moka", voti: 0 },
       { lettera: "C", idea: "Lista della spesa a voce", voti: 0 },
     ],
   },
+  // il banco. Un regalo con «esce» nel futuro si vede «in arrivo» e si apre da solo a quell'ora.
   prodotti: [
-    // compare da sola alla data "dal"
-    { nome: "Lista della spesa a voce", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", dal: "2026-10-09T19:00:00+02:00" },
+    // { nome: "Timer p' 'a moka", emoji: "☕", descrizione: "...", link: "regali/timer-moka/", esce: "2026-10-09T19:00:00+02:00", lettera: "B", voti: 0 },
+    { nome: "Lista della spesa a voce", emoji: "🛒", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", esce: "2026-10-09T19:00:00+02:00", lettera: "C", voti: 0 },
   ],
+  // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
+  prossimo: {
+    dal: "2026-10-12T00:00:00+02:00",
+    voto: {
+      chiude: "2026-10-14T23:59:00+02:00",
+      uscita: "2026-10-16T19:00:00+02:00",
+      conteggio: "",
+      vince: "",
+      opzioni: [
+        { lettera: "A", idea: "'A munnezza 'e stasera", voti: 0 },
+        { lettera: "B", idea: "Addò aggio parcheggiato?", voti: 0 },
+        { lettera: "C", idea: "'E punte d' 'a scopa", voti: 0 },
+      ],
+    },
+    diario: [
+      { giorno: 10, titolo: "Tre idee nuove sul banco", testo: "La differenziata, il parcheggio e la scopa: si vota nei commenti fino a mercoledì." },
+    ],
+  },
   diario: [
-    { giorno: 7, titolo: "Il primo regalo è sul banco", testo: "La lista della spesa a voce: gratis per tutti.", dal: "2026-10-09T19:00:00+02:00" },
     { giorno: 6, titolo: "Ha vinto la C", testo: "Avete scelto la lista della spesa a voce. Esce venerdì alle 19." },
     { giorno: 2, titolo: "Tre idee sul banco", testo: "A, B o C: si vota nei commenti fino a mercoledì." },
     { giorno: 1, titolo: "Apro la bancarella", testo: "Gennarino si presenta." },
@@ -239,64 +267,115 @@ const DATI = {
 const num = n => n.toLocaleString("it-IT");
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, "0");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const dataBreve = d => d.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome" });
+const ora = d => d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
+const quando = d => dataBreve(d) + " alle " + ora(d);
+const esterno = l => /^https?:/i.test(l);
 
 function giornoCorrente(now) {
   return Math.max(1, Math.floor((now - new Date(DATI.inizio)) / 864e5) + 1);
 }
+// il regalo legato al voto di questa settimana (esce all'ora dell'uscita)
+// il voto in corso: quello della settimana dopo appena arriva il suo lunedì
+function votoAttivo(now) {
+  const p = DATI.prossimo;
+  return p && p.voto && now >= new Date(p.dal) ? p.voto : DATI.voto;
+}
+function regaloSettimana() {
+  const u = +new Date(votoAttivo(new Date()).uscita);
+  return DATI.prodotti.find(p => p.esce && +new Date(p.esce) === u) || null;
+}
 
+let uscitoGia = null;
 function render() {
-  const now = new Date();
+  const now = new Date(), V = votoAttivo(now), uscita = new Date(V.uscita), chiuso = now >= new Date(V.chiude);
   $("giorno-label").textContent = "Giorno " + giornoCorrente(now);
   $("link-tiktok").href = DATI.linkTikTok;
   $("data-scontrino").textContent = now.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Rome" });
 
-  const ops = DATI.voto.opzioni;
+  // lo scontrino del voto
+  const ops = V.opzioni;
   const tot = ops.reduce((s, o) => s + o.voti, 0);
   const max = Math.max(...ops.map(o => o.voti));
-  const vin = DATI.voto.vincitore;
-  $("righe").innerHTML = ops.map(o => {
-    const vince = vin ? o.lettera === vin : (tot && o.voti === max);
-    const val = o.voti ? num(o.voti) : (vin ? "" : "0");
-    return `<div class="riga"><span><b>${o.lettera}</b> · ${o.idea}</span><span class="${vince ? "pos" : ""}">${vince && vin ? "VINCE " : ""}${val}</span></div>`;
-  }).join("");
-  if (vin && !tot) { $("tot-label").textContent = "HA VINTO"; $("cassa").textContent = vin; }
-  else $("cassa").textContent = num(tot);
-  if (vin) $("live").textContent = "VOTI CHIUSI";
-  const uscito = now >= new Date(DATI.voto.uscita);
-  $("cd-box").hidden = uscito;
-  $("uscito").hidden = !uscito;
-  $("cd-label").textContent = "Il regalo esce " + dataBreve(new Date(DATI.voto.uscita)) + " alle " +
-    new Date(DATI.voto.uscita).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }) + ". Mancano";
-  if (vin) $("voto-nota").textContent = "Le votazioni sono chiuse. Grazie a chi ha scritto la sua lettera nei commenti!";
+  const primi = ops.filter(o => o.voti === max);
+  const zero = V.vince === "nessuno";   // nessuno ha votato: questa settimana niente app
+  const vince = zero ? "" : V.vince || (chiuso && tot && primi.length === 1 ? primi[0].lettera : "");
+  $("righe").innerHTML = ops.map(o =>
+    `<div class="riga${o.lettera === vince ? " vince" : ""}"><span><b>${esc(o.lettera)}</b> · ${esc(o.idea)}${o.lettera === vince ? " <em>★ HA VINTO</em>" : ""}</span><span class="${tot && o.voti === max ? "pos" : ""}">${num(o.voti)}</span></div>`
+  ).join("");
+  $("cassa").textContent = num(tot);
+  $("live").textContent = zero ? "VOTO CHIUSO · NESSUN VOTO" : chiuso ? (vince ? "VOTO CHIUSO · HA VINTO LA " + vince : "VOTO CHIUSO · STO CONTANDO")
+    : V.conteggio ? "CONTEGGIO DI " + dataBreve(new Date(V.conteggio)).toUpperCase() : "PRIMO CONTEGGIO IN ARRIVO";
+  $("come-votare").textContent = zero
+    ? "Questa settimana nei commenti non ha votato nessuno, quindi niente app. Lunedì arrivano tre idee nuove: basta una lettera nei commenti per decidere."
+    : chiuso
+    ? "Il voto di questa settimana è chiuso. Lunedì arrivano tre idee nuove: tieni d'occhio TikTok."
+    : "Per votare scrivi la lettera nei commenti dell'ultimo video. Si vota fino a " + dataBreve(new Date(V.chiude)) + " sera.";
 
-  const visibili = DATI.prodotti.filter(p => !p.dal || now >= new Date(p.dal));
-  const inArrivo = DATI.prodotti.filter(p => p.dal && now < new Date(p.dal));
-  const prodotti = visibili.map(p => `
-    <article class="prodotto">
-      <h3>${p.nome}</h3><p>${p.descrizione}</p>
-      <div class="piede"><span class="prezzo">Gratis</span>
-      <a class="btn" href="${p.link}" target="_blank" rel="noopener">Apri</a></div>
-    </article>`).join("");
-  const attesa = inArrivo.length ? `
-    <article class="prodotto vuoto">
-      <h3>In arrivo: ${inArrivo[0].nome}</h3>
-      <p>Esce ${dataBreve(new Date(inArrivo[0].dal))} alle 19, qui sul banco. Gratis per tutti.</p>
-    </article>` : `
-    <article class="prodotto vuoto">
-      <h3>Il prossimo regalo arriva venerdì</h3>
-      <p>Vince l'idea più votata nei commenti. La trovi qui, gratis, appena esce.</p>
-      <div class="piede"><a class="btn secondario" href="${DATI.linkTikTok}" target="_blank" rel="noopener">Vota su TikTok</a></div>
+  // il conto alla rovescia, oppure il regalo già uscito
+  const reg = regaloSettimana(), uscito = now >= uscita;
+  uscitoGia = uscito;
+  $("cd").hidden = uscito || zero;
+  $("uscito").hidden = !uscito && !zero;
+  if (zero) {
+    $("cd-label").textContent = "Voto chiuso";
+    $("uscito").innerHTML = `<b>😔 Questa settimana niente regalo</b><p class="lede">Nei commenti non ha votato nessuno, e le app le scegliete voi. Lunedì tre idee nuove.</p><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Seguimi su TikTok</a>`;
+  } else if (uscito) {
+    $("cd-label").textContent = "Venerdì " + uscita.toLocaleDateString("it-IT", { day: "numeric", month: "long", timeZone: "Europe/Rome" });
+    $("uscito").innerHTML = reg
+      ? `<b>${esc(reg.emoji || "🎁")} ${esc(reg.nome)} è sul banco!</b><a class="btn" href="${esc(reg.link)}"${esterno(reg.link) ? ' target="_blank" rel="noopener"' : ""}>Aprilo, è gratis</a>`
+      : `<b>🎁 Il regalo arriva a momenti</b><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Guarda su TikTok</a>`;
+  } else {
+    $("cd-label").textContent = "Il regalo esce " + quando(uscita) + ". Mancano";
+  }
+
+  // il banco: prima i regali in arrivo, poi gli usciti dal più nuovo
+  const lista = DATI.prodotti.map(p => ({ ...p, t: p.esce ? new Date(p.esce) : null }))
+    .sort((a, b) => (b.t || 0) - (a.t || 0));
+  const card = p => {
+    const arrivo = p.t && now < p.t, nuovo = !arrivo && p.t && now - p.t < 7 * 864e5;
+    const vinto = p.lettera ? `<small>Ha vinto la ${esc(p.lettera)}${p.voti ? " con " + num(p.voti) + " voti" : ""}</small>` : "";
+    return `<article class="prodotto${arrivo ? " arrivo" : nuovo ? " nuovo" : ""}">
+      ${arrivo ? '<span class="badge">In arrivo</span>' : nuovo ? '<span class="badge">Nuovo</span>' : ""}
+      <h3>${p.emoji ? esc(p.emoji) + " " : ""}${esc(p.nome)}</h3><p>${esc(p.descrizione)}</p>
+      <div class="piede"><span class="prezzo">Gratis</span>${arrivo
+        ? `<span class="esce">Esce ${esc(quando(p.t))}</span>`
+        : `<a class="btn" href="${esc(p.link)}"${esterno(p.link) ? ' target="_blank" rel="noopener"' : ""}>Apri</a>`}</div>
+      ${vinto}
     </article>`;
-  $("prodotti").innerHTML = prodotti + attesa;
+  };
+  const attesa = zero ? `
+    <article class="prodotto vuoto">
+      <h3>Questa settimana il banco resta vuoto</h3>
+      <p>Nessuno ha votato, quindi niente app. Lunedì tre idee nuove: vota con una lettera nei commenti.</p>
+      <div class="piede"><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Vota su TikTok</a></div>
+    </article>` : !reg && !uscito ? `
+    <article class="prodotto vuoto">
+      <h3>${DATI.prodotti.length ? "Il regalo di questa settimana" : "Il primo regalo"} arriva ${esc(dataBreve(uscita))}</h3>
+      <p>Vince l'idea più votata nei commenti. La trovi qui, gratis, appena esce.</p>
+      <div class="piede"><a class="btn secondario" href="${esc(DATI.linkTikTok)}" target="_blank" rel="noopener">Vota su TikTok</a></div>
+    </article>` : "";
+  $("prodotti").innerHTML = attesa + lista.map(card).join("");
 
-  $("diario").innerHTML = DATI.diario.filter(e => !e.dal || now >= new Date(e.dal)).map(e =>
-    `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${e.titolo}</b><span>${e.testo}</span></div></li>`).join("");
+  // in alto: il regalo appena uscito
+  const fresco = lista.find(p => p.t && now >= p.t && now - p.t < 7 * 864e5);
+  const cta = $("cta-regalo");
+  cta.hidden = !fresco;
+  if (fresco) {
+    cta.textContent = "🎁 Apri " + fresco.nome;
+    cta.href = fresco.link;
+    if (esterno(fresco.link)) { cta.target = "_blank"; cta.rel = "noopener"; } else { cta.removeAttribute("target"); }
+  }
+
+  const extra = DATI.prossimo && now >= new Date(DATI.prossimo.dal) ? (DATI.prossimo.diario || []) : [];
+  $("diario").innerHTML = extra.concat(DATI.diario).map(e =>
+    `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${esc(e.titolo)}</b><span>${esc(e.testo)}</span></div></li>`).join("");
 }
 
 function tick() {
-  let ms = new Date(DATI.voto.uscita) - new Date();
-  if (ms < 0) ms = 0;
+  let ms = new Date(votoAttivo(new Date()).uscita) - new Date();
+  if (ms <= 0) { if (!uscitoGia) render(); ms = 0; }
   const g = Math.floor(ms / 864e5); ms -= g * 864e5;
   const h = Math.floor(ms / 36e5); ms -= h * 36e5;
   const m = Math.floor(ms / 6e4); ms -= m * 6e4;
