@@ -231,13 +231,13 @@ const DATI = {
     opzioni: [
       { lettera: "A", idea: "Dividi il conto in pizzeria", voti: 0 },
       { lettera: "B", idea: "Timer per la moka", voti: 0 },
-      { lettera: "C", idea: "Lista della spesa a voce", voti: 0 },
+      { lettera: "C", idea: "Lista della spesa a voce", voti: 1 },
     ],
   },
   // il banco. Un regalo con «esce» nel futuro si vede «in arrivo» e si apre da solo a quell'ora.
   prodotti: [
     // { nome: "Timer p' 'a moka", emoji: "☕", descrizione: "...", link: "regali/timer-moka/", esce: "2026-10-09T19:00:00+02:00", lettera: "B", voti: 0 },
-    { nome: "Lista della spesa a voce", emoji: "🛒", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", esce: "2026-10-09T19:00:00+02:00", lettera: "C", voti: 0 },
+    { nome: "Lista della spesa a voce", emoji: "🛒", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", esce: "2026-10-09T19:00:00+02:00", lettera: "C", voti: 1 },
   ],
   // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
   prossimo: {
@@ -258,7 +258,10 @@ const DATI = {
     ],
   },
   diario: [
+    { giorno: 7, titolo: "Il primo regalo è sul banco", testo: "La lista della spesa a voce è uscita: gratis per tutti.", dal: "2026-10-09T19:00:00+02:00" },
     { giorno: 6, titolo: "Ha vinto la C", testo: "Avete scelto la lista della spesa a voce. Esce venerdì alle 19." },
+    { giorno: 5, titolo: "Voto chiuso", testo: "Si è votato nei commenti fino a mercoledì sera." },
+    { giorno: 3, titolo: "Le tre app in azione", testo: "Nella parte 2 Gennarino fa vedere il conto in pizzeria, il timer per la moka e la lista della spesa." },
     { giorno: 2, titolo: "Tre idee sul banco", testo: "A, B o C: si vota nei commenti fino a mercoledì." },
     { giorno: 1, titolo: "Apro la bancarella", testo: "Gennarino si presenta." },
   ],
@@ -369,7 +372,7 @@ function render() {
   }
 
   const extra = DATI.prossimo && now >= new Date(DATI.prossimo.dal) ? (DATI.prossimo.diario || []) : [];
-  $("diario").innerHTML = extra.concat(DATI.diario).map(e =>
+  $("diario").innerHTML = extra.concat(DATI.diario).filter(e => !e.dal || now >= new Date(e.dal)).map(e =>
     `<li><span class="g">GIORNO ${e.giorno}</span><div><b>${esc(e.titolo)}</b><span>${esc(e.testo)}</span></div></li>`).join("");
 }
 
