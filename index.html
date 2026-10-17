@@ -224,14 +224,14 @@ const DATI = {
   linkTikTok: "https://www.tiktok.com/@bancariello.gennarino",
   // il voto della settimana: si vota fino a «chiude», il regalo esce a «uscita»
   voto: {
-    chiude: "2026-10-07T23:59:00+02:00",    // mercoledì sera
-    uscita: "2026-10-09T19:00:00+02:00",    // venerdì alle 19: esce il regalo
-    conteggio: "2026-10-08T17:50:00+02:00", // quando sono stati contati i voti dai commenti (vuoto: non ancora)
-    vince: "C",                             // la lettera vincente, a voto chiuso; "nessuno" se nei commenti non ha votato nessuno (niente app)
+    chiude: "2026-10-14T23:59:00+02:00",    // mercoledì sera
+    uscita: "2026-10-16T19:00:00+02:00",    // venerdì alle 19: esce il regalo
+    conteggio: "",                          // quando sono stati contati i voti dai commenti (vuoto: non ancora)
+    vince: "B",                             // la lettera vincente, a voto chiuso; "nessuno" se nei commenti non ha votato nessuno (niente app)
     opzioni: [
-      { lettera: "A", idea: "Dividi il conto in pizzeria", voti: 0 },
-      { lettera: "B", idea: "Timer per la moka", voti: 0 },
-      { lettera: "C", idea: "Lista della spesa a voce", voti: 1 },
+      { lettera: "A", idea: "Promemoria della differenziata", voti: 0 },
+      { lettera: "B", idea: "Dove ho parcheggiato", voti: 1 },
+      { lettera: "C", idea: "Dove sono le fontanelle", voti: 0 },
     ],
   },
   // il banco. Un regalo con «esce» nel futuro si vede «in arrivo» e si apre da solo a quell'ora.
@@ -242,25 +242,26 @@ const DATI = {
   ],
   // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
   prossimo: {
-    dal: "2026-10-11T00:00:00+02:00",
+    dal: "2026-10-18T00:00:00+02:00",
     voto: {
-      chiude: "2026-10-14T23:59:00+02:00",
-      uscita: "2026-10-16T19:00:00+02:00",
+      chiude: "2026-10-21T23:59:00+02:00",
+      uscita: "2026-10-23T19:00:00+02:00",
       conteggio: "",
-      vince: "B",
+      vince: "",
       opzioni: [
-        { lettera: "A", idea: "Promemoria della differenziata", voti: 0 },
-        { lettera: "B", idea: "Dove ho parcheggiato", voti: 1 },
-        { lettera: "C", idea: "Dove sono le fontanelle", voti: 0 },
+        { lettera: "A", idea: "Scadenze della macchina", voti: 0 },
+        { lettera: "B", idea: "Timer per la pasta", voti: 0 },
+        { lettera: "C", idea: "Quaderno dei prestiti", voti: 0 },
       ],
     },
     diario: [
-      { giorno: 14, titolo: "Il secondo regalo è sul banco", testo: "Dove ho parcheggiato è uscita: gratis per tutti.", dal: "2026-10-16T19:00:00+02:00" },
-      { giorno: 13, titolo: "Ha vinto la B", testo: "Avete scelto Dove ho parcheggiato. Esce venerdì alle 19." },
-      { giorno: 9, titolo: "Piazza nuova, tre idee nuove", testo: "La differenziata, il parcheggio e le fontanelle: si vota nei commenti fino a mercoledì." },
+      { giorno: 16, titolo: "Piazza del Gesù Nuovo, idee nuove", testo: "Le scadenze della macchina, il timer per la pasta e il quaderno dei prestiti: si vota nei commenti fino a mercoledì." },
     ],
   },
   diario: [
+    { giorno: 14, titolo: "Il secondo regalo è sul banco", testo: "Dove ho parcheggiato è uscita: gratis per tutti.", dal: "2026-10-16T19:00:00+02:00" },
+    { giorno: 13, titolo: "Ha vinto la B", testo: "Avete scelto Dove ho parcheggiato. Esce venerdì alle 19." },
+    { giorno: 9, titolo: "Piazza nuova, tre idee nuove", testo: "La differenziata, il parcheggio e le fontanelle: si vota nei commenti fino a mercoledì." },
     { giorno: 7, titolo: "Il primo regalo è sul banco", testo: "La lista della spesa a voce è uscita: gratis per tutti.", dal: "2026-10-09T19:00:00+02:00" },
     { giorno: 6, titolo: "Ha vinto la C", testo: "Avete scelto la lista della spesa a voce. Esce venerdì alle 19." },
     { giorno: 5, titolo: "Voto chiuso", testo: "Si è votato nei commenti fino a mercoledì sera." },
