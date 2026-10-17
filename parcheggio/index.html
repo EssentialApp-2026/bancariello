@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dove ho parcheggiato · Gennarino</title>
+<meta name="description" content="Segna dove hai lasciato la macchina e ritrovala, con il timer per la sosta. Il regalo di Gennarino, 'O Bancariello: gratis, senza registrazione e senza pubblicità.">
+<meta name="theme-color" content="#171a33">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icona-192.png">
+<link rel="apple-touch-icon" href="icona-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Parcheggio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&display=swap">
+<style>
+/* Stessa bancarella della lista della spesa: carta crema, inchiostro scuro, pomodoro per l'azione, verde LED per «ti guido io». */
+:root{
+  --notte:#171a33; --carta:#fbf3e2; --carta-2:#f3e8d0; --riga:#e2d5b8;
+  --inchiostro:#2a2230; --tenue:#7a6f63; --pomodoro:#e63946; --pomodoro-scuro:#b02a35;
+  --led:#1aa88c; --led-chiaro:#4ff0d0; --ok:#1d7a55; --avviso:#c46a00;
+  --display:"Bungee","Arial Black",Impact,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--carta:#1d2140;--carta-2:#262b52;--riga:#363b6b;--inchiostro:#eef0ff;--tenue:#a9aed6;--led:#4ff0d0;--ok:#57d39a;--avviso:#ffb454;color-scheme:dark}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--carta);color:var(--inchiostro);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100dvh;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.tenda{height:34px;background:repeating-linear-gradient(90deg,var(--pomodoro) 0 44px,#fbf3e2 44px 88px);position:relative}
+.tenda::after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:14px;
+  background:radial-gradient(circle at 22px 0,var(--pomodoro) 21px,transparent 22px) 0 0/88px 14px repeat-x,
+             radial-gradient(circle at 66px 0,#fbf3e2 21px,transparent 22px) 0 0/88px 14px repeat-x}
+main{max-width:520px;margin:0 auto;padding:30px 16px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+p{margin:0}
+header{display:flex;gap:14px;align-items:center}
+header > div{min-width:0}
+header svg{flex:0 0 64px;width:64px;height:auto}
+header h1{font-family:var(--display);font-weight:400;font-size:1.55rem;line-height:1.05;margin:0}
+header p{margin:2px 0 0;color:var(--tenue);font-size:.92rem}
+
+/* il tasto grande */
+.segna{display:grid;justify-items:center;gap:12px;padding:8px 0 4px}
+.pulsante{width:148px;height:148px;border-radius:50%;border:0;background:var(--pomodoro);color:#fff;cursor:pointer;display:grid;place-items:center;align-content:center;gap:4px;
+  box-shadow:0 10px 0 var(--pomodoro-scuro),0 14px 26px rgba(176,42,53,.35);transition:transform .08s,box-shadow .08s;touch-action:manipulation;font-weight:800;font-size:.95rem}
+.pulsante:active{transform:translateY(6px);box-shadow:0 4px 0 var(--pomodoro-scuro),0 6px 12px rgba(176,42,53,.3)}
+.pulsante svg{width:52px;height:52px}
+.pulsante[disabled]{background:var(--led);box-shadow:0 10px 0 #0e6e5c;animation:onda 1.3s infinite}
+@keyframes onda{0%{box-shadow:0 10px 0 #0e6e5c,0 0 0 0 rgba(79,240,208,.55)}100%{box-shadow:0 10px 0 #0e6e5c,0 0 0 26px rgba(79,240,208,0)}}
+.stato{font-weight:800;font-size:1.05rem;text-align:center;min-height:1.5em}
+.stato.errore{color:var(--pomodoro)}
+.esempio{font-size:.9rem;color:var(--tenue);text-align:center;max-width:38ch}
+
+/* schede */
+.scheda{background:var(--carta-2);border:2px solid var(--riga);border-radius:18px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+.scheda h2{font-family:var(--display);font-weight:400;font-size:.95rem;letter-spacing:.04em;margin:0;color:var(--pomodoro);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;align-items:baseline}
+.scheda h2 small{font-family:var(--body);font-size:.8rem;color:var(--tenue);font-weight:600;letter-spacing:0}
+.grande{font-size:1.25rem;font-weight:800;line-height:1.2}
+.tenue{color:var(--tenue);font-size:.9rem}
+.campo{display:flex;gap:8px}
+.campo input{flex:1;min-width:0;height:48px;border-radius:14px;border:2px solid var(--riga);background:var(--carta);color:var(--inchiostro);padding:0 14px}
+.campo input:focus{outline:none;border-color:var(--led)}
+.btn{height:48px;min-width:48px;padding:0 16px;border-radius:14px;border:0;background:var(--inchiostro);color:var(--carta);font-weight:800;cursor:pointer;text-decoration:none;display:inline-grid;place-items:center}
+.btn.led{background:var(--led);color:#06241e}
+.btn.vuoto{background:transparent;border:2px solid var(--riga);color:var(--inchiostro)}
+
+/* la bussola */
+.guida{justify-items:center;text-align:center}
+.guida h2{justify-content:space-between}
+.guida[hidden]{display:none}
+.bussola{width:168px;height:168px;border-radius:50%;border:3px solid var(--riga);background:var(--carta);display:grid;place-items:center;position:relative}
+.bussola svg{width:96px;height:96px;transition:transform .25s linear}
+.bussola .n{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-weight:800;font-size:.75rem;color:var(--tenue)}
+.distanza{font-family:var(--display);font-size:2.1rem;line-height:1}
+.arrivato .distanza{color:var(--ok)}
+
+/* timer */
+.catene{display:flex;flex-wrap:wrap;gap:8px}
+.catene button{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid var(--riga);background:var(--carta);font-weight:800;cursor:pointer}
+.catene button[aria-pressed="true"]{background:var(--led);border-color:var(--led);color:#06241e}
+.conto{font-family:var(--display);font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.conto.poco{color:var(--avviso)}
+.conto.scaduto{color:var(--pomodoro)}
+
+/* barra in basso */
+.azioni{position:fixed;left:0;right:0;bottom:0;background:var(--notte);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:5}
+.azioni div{max-width:520px;margin:0 auto;display:flex;gap:8px}
+.azioni button{flex:1;min-height:50px;border-radius:999px;border:2px solid #363b6b;background:transparent;color:#eef0ff;font-weight:800;font-size:.95rem;cursor:pointer;padding:0 8px}
+.azioni button.primario{background:#4ff0d0;border-color:#4ff0d0;color:#14202a}
+.azioni button.conferma{background:var(--pomodoro);border-color:var(--pomodoro)}
+
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--inchiostro);color:var(--carta);border-radius:14px;padding:12px 16px;width:max-content;max-width:calc(100vw - 32px);transition:.2s;z-index:6;font-size:.95rem}
+.toast.su{opacity:1;transform:translate(-50%,0)}
+.installa{display:none;justify-self:center;background:none;border:2px solid var(--riga);border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}
+.installa.si{display:block}
+footer{text-align:center;color:var(--tenue);font-size:.82rem;padding:26px 16px 10px}
+footer a{color:var(--tenue)}
+:focus-visible{outline:3px solid var(--led);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="tenda" aria-hidden="true"></div>
+<main>
+  <header>
+    <svg viewBox="0 0 120 130" aria-hidden="true">
+      <line x1="60" y1="6" x2="60" y2="22" stroke="#a9aed6" stroke-width="4"/>
+      <circle cx="60" cy="8" r="7" fill="#e63946"/>
+      <rect x="10" y="20" width="100" height="66" rx="20" fill="#e8edf5"/>
+      <rect x="18" y="27" width="84" height="52" rx="14" fill="#0e1824"/>
+      <rect x="2" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <rect x="108" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <path d="M33 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M69 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="51" y="62" width="18" height="6" rx="3" fill="#4ff0d0"/>
+      <rect x="24" y="92" width="72" height="38" rx="14" fill="#ced6e2"/>
+      <rect x="38" y="100" width="44" height="16" rx="5" fill="#28344a"/>
+      <circle cx="47" cy="108" r="3" fill="#4ff0d0"/><circle cx="56" cy="108" r="3" fill="#4ff0d0"/><circle cx="65" cy="108" r="3" fill="#4ff0d0"/><circle cx="74" cy="108" r="3" fill="#1e5a5a"/>
+    </svg>
+    <div>
+      <h1>Dove ho parcheggiato</h1>
+      <p>Un tocco e ti ricordo io il posto. Un regalo di Gennarino.</p>
+    </div>
+  </header>
+
+  <!-- prima di segnare -->
+  <section class="segna" id="vuoto" aria-label="Segna la macchina">
+    <button class="pulsante" id="segna">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.6"/>
+      </svg>
+      <span id="segna-testo">Sono qui</span>
+    </button>
+    <p class="stato" id="stato" aria-live="polite">Scendi dalla macchina e tocca</p>
+    <p class="esempio" id="esempio">Il telefono ti chiederà il permesso per la posizione. Il posto resta solo sul tuo telefono: non lo vede nessuno, nemmeno io.</p>
+  </section>
+
+  <!-- macchina segnata -->
+  <section id="segnata" hidden aria-label="La tua macchina">
+    <div class="scheda">
+      <h2>La tua macchina <small id="quando"></small></h2>
+      <p class="grande" id="riga-posto"></p>
+      <p class="tenue" id="precisione"></p>
+      <div class="campo">
+        <label class="sr" for="nota">Nota sul posto</label>
+        <input id="nota" maxlength="80" placeholder="Una nota: piano -2, colonna B, via Roma…" enterkeyhint="done" autocomplete="off">
+        <button class="btn" id="salva-nota" aria-label="Salva la nota">Salva</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="scheda guida" id="guida" hidden aria-label="Ti riporto alla macchina">
+    <h2 style="justify-self:stretch">Ti riporto io <small id="guida-stato">sto cercando il GPS…</small></h2>
+    <div class="bussola" aria-hidden="true">
+      <span class="n">N</span>
+      <svg id="freccia" viewBox="0 0 100 100"><path d="M50 6 L78 62 L50 50 L22 62 Z" fill="#e63946"/><path d="M50 50 L78 62 L50 94 L22 62 Z" fill="#171a33" opacity=".85"/></svg>
+    </div>
+    <p class="distanza" id="distanza" aria-live="off">—</p>
+    <p class="tenue" id="guida-nota">La freccia punta verso la macchina.</p>
+    <p class="sr" id="guida-aria" aria-live="polite"></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <a class="btn led" id="mappe" target="_blank" rel="noopener">Apri nelle mappe</a>
+      <button class="btn vuoto" id="ferma-guida">Smetti di guidarmi</button>
+    </div>
+  </section>
+
+  <section class="scheda" id="timer" hidden aria-label="Timer della sosta">
+    <h2>Timer della sosta <small id="timer-nota">avviso prima che scada</small></h2>
+    <div id="timer-scelta" class="catene" role="group" aria-label="Quanto hai pagato">
+      <button data-min="30" aria-pressed="false">30 min</button>
+      <button data-min="60" aria-pressed="false">1 ora</button>
+      <button data-min="90" aria-pressed="false">1 ora e mezza</button>
+      <button data-min="120" aria-pressed="false">2 ore</button>
+    </div>
+    <div class="campo" id="timer-altro">
+      <label class="sr" for="minuti">Minuti</label>
+      <input id="minuti" type="number" inputmode="numeric" min="1" max="1440" placeholder="Altri minuti (es. 45)">
+      <button class="btn" id="avvia-minuti">Avvia</button>
+    </div>
+    <div id="timer-corsa" hidden>
+      <p class="conto" id="conto" aria-live="off">00:00</p>
+      <p class="tenue" id="timer-fine"></p>
+      <button class="btn vuoto" id="ferma-timer" style="margin-top:10px">Ferma il timer</button>
+    </div>
+    <p class="tenue" id="timer-avviso">Per l'avviso tieni l'app aperta o in background: se il telefono la chiude, il suono può non arrivare. Quando la riapri vedi sempre quanto manca.</p>
+  </section>
+
+  <button class="installa" id="installa">Metti l'app sul telefono</button>
+</main>
+<footer>Gratis, senza registrazione e senza pubblicità. Il posto resta solo sul tuo telefono.<br>
+  <a href="../">'O Bancariello</a> · <a href="https://www.tiktok.com/@bancariello.gennarino" target="_blank" rel="noopener">Gennarino su TikTok</a></footer>
+
+<nav class="azioni" id="barra" aria-label="Azioni" hidden>
+  <div>
+    <button class="primario" id="riportami">Riportami lì</button>
+    <button id="condividi">Condividi</button>
+    <button id="trovata">Trovata!</button>
+  </div>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+const CHIAVE = "dove-ho-parcheggiato-v1";
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+
+/* ---------- memoria: solo su questo telefono ---------- */
+let S = { pos: null, nota: "", fine: null };
+function carica() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CHIAVE) || "null");
+    if (v && v.pos && isFinite(v.pos.lat) && isFinite(v.pos.lon)) S = { pos: v.pos, nota: String(v.nota || "").slice(0, 80), fine: isFinite(v.fine) ? v.fine : null };
+  } catch (_) { /* memoria non disponibile: l'app funziona lo stesso, finché resta aperta */ }
+}
+function salva() { try { localStorage.setItem(CHIAVE, JSON.stringify(S)); } catch (_) {} }
+
+let tt;
+function toast(t, ms = 3200) {
+  const el = $("toast"); el.textContent = t; el.classList.add("su");
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove("su"), ms);
+}
+
+/* ---------- geometria ---------- */
+const R = 6371000, rad = d => d * Math.PI / 180, gra = r => r * 180 / Math.PI;
+function distanza(a, b) {
+  const dLa = rad(b.lat - a.lat), dLo = rad(b.lon - a.lon);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLo / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+function rotta(a, b) {
+  const y = Math.sin(rad(b.lon - a.lon)) * Math.cos(rad(b.lat));
+  const x = Math.cos(rad(a.lat)) * Math.sin(rad(b.lat)) - Math.sin(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.cos(rad(b.lon - a.lon));
+  return (gra(Math.atan2(y, x)) + 360) % 360;
+}
+const PUNTI = ["nord", "nord-est", "est", "sud-est", "sud", "sud-ovest", "ovest", "nord-ovest"];
+const punto = g => PUNTI[Math.round(g / 45) % 8];
+function metri(m) { return m < 1000 ? Math.round(m / (m < 100 ? 5 : 10)) * (m < 100 ? 5 : 10) + " m" : (m / 1000).toFixed(m < 10000 ? 1 : 0).replace(".", ",") + " km"; }
+function fa(t) {
+  const m = Math.max(0, Math.round((Date.now() - t) / 60000));
+  if (m < 1) return "adesso";
+  if (m < 60) return m + " min fa";
+  const h = Math.floor(m / 60);
+  return h < 24 ? h + (h === 1 ? " ora fa" : " ore fa") : "più di un giorno fa";
+}
+const hhmm = t => { const d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()); };
+const mapsLink = p => "https://www.google.com/maps/dir/?api=1&destination=" + p.lat.toFixed(6) + "," + p.lon.toFixed(6) + "&travelmode=walking";
+
+/* ---------- posizione: prendo la lettura migliore in pochi secondi ---------- */
+function posizioneBuona() {
+  return new Promise((ok, no) => {
+    if (!navigator.geolocation) return no({ code: 0 });
+    let migliore = null, finito = false, id = null;
+    const chiudi = () => {
+      if (finito) return; finito = true;
+      if (id != null) navigator.geolocation.clearWatch(id);
+      clearTimeout(tm);
+      migliore ? ok(migliore) : no({ code: 3 });
+    };
+    const tm = setTimeout(chiudi, 9000);
+    id = navigator.geolocation.watchPosition(p => {
+      if (!migliore || p.coords.accuracy < migliore.acc) migliore = { lat: p.coords.latitude, lon: p.coords.longitude, acc: Math.round(p.coords.accuracy), t: Date.now() };
+      if (migliore.acc <= 15) chiudi();
+    }, e => { if (!migliore) { finito = true; clearTimeout(tm); if (id != null) navigator.geolocation.clearWatch(id); no(e); } else chiudi(); },
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 9000 });
+  });
+}
+function messaggioErrore(e) {
+  if (e && e.code === 1) return "Non ho il permesso per la posizione. Attivalo nelle impostazioni del browser per questo sito e riprova.";
+  if (e && e.code === 0) return "Questo telefono non mi dà la posizione.";
+  return "Non riesco a trovare il GPS. Esci allo scoperto un attimo e riprova.";
+}
+
+/* ---------- segnare la macchina ---------- */
+async function segna() {
+  const b = $("segna"), st = $("stato");
+  b.disabled = true; $("segna-testo").textContent = "Cerco…"; st.className = "stato"; st.textContent = "Sto leggendo il GPS, un attimo…";
+  try {
+    const p = await posizioneBuona();
+    S = { pos: p, nota: "", fine: null };
+    salva(); fermaGuida(); disegna();
+    toast("Segnato! Ora vai tranquillo.");
+    if (navigator.vibrate) navigator.vibrate(40);
+  } catch (e) {
+    st.className = "stato errore"; st.textContent = messaggioErrore(e);
+  } finally {
+    b.disabled = false; $("segna-testo").textContent = "Sono qui";
+  }
+}
+
+/* ---------- schermata ---------- */
+function disegna() {
+  const c = !!S.pos;
+  $("vuoto").hidden = c; $("segnata").hidden = !c; $("timer").hidden = !c; $("barra").hidden = !c;
+  if (!$("vuoto").hidden) { $("stato").className = "stato"; $("stato").textContent = "Scendi dalla macchina e tocca"; }
+  if (!c) { $("guida").hidden = true; return; }
+  $("quando").textContent = "segnata alle " + hhmm(S.pos.t) + " · " + fa(S.pos.t);
+  $("riga-posto").textContent = S.nota ? S.nota : "Posto segnato sul GPS";
+  $("precisione").textContent = S.pos.acc <= 20 ? "Posizione precisa (circa " + S.pos.acc + " m)."
+    : "Il GPS era un po' incerto (circa " + S.pos.acc + " m). Se sei in un garage, scrivi anche il piano.";
+  $("nota").value = S.nota;
+  $("mappe").href = mapsLink(S.pos);
+  disegnaTimer();
+}
+$("segna").addEventListener("click", segna);
+$("salva-nota").addEventListener("click", () => {
+  S.nota = $("nota").value.trim().slice(0, 80); salva(); disegna(); toast(S.nota ? "Nota salvata." : "Nota tolta.");
+});
+$("nota").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("salva-nota").click(); } });
+
+/* ---------- guida verso la macchina ---------- */
+let watch = null, bussola = null, heading = null, ultima = null, haBussola = false;
+function arrivo(d) {
+  const el = $("guida");
+  el.classList.toggle("arrivato", d < 12);
+}
+function aggiornaGuida() {
+  if (!ultima || !S.pos) return;
+  const d = distanza(ultima, S.pos), g = rotta(ultima, S.pos);
+  const imprecisione = Math.max(ultima.acc || 0, S.pos.acc || 0);
+  $("distanza").textContent = d < 12 ? "Ci sei!" : metri(d);
+  arrivo(d);
+  $("guida-stato").textContent = "GPS ±" + (ultima.acc || "?") + " m";
+  const rel = haBussola && heading != null ? (g - heading + 360) % 360 : g;
+  $("freccia").style.transform = "rotate(" + rel + "deg)";
+  $("guida-nota").textContent = d < 12 ? "Dovresti averla vicinissima: guardati intorno."
+    : haBussola ? "Segui la freccia. La macchina è verso " + punto(g) + "."
+    : "La bussola non c'è: in alto è il nord. La macchina è verso " + punto(g) + ".";
+  $("guida-aria").textContent = d < 12 ? "Sei arrivato." : "Macchina a " + metri(d) + ", verso " + punto(g) + ".";
+  if (d < Math.max(30, imprecisione)) $("guida-nota").textContent += " Il GPS ha qualche metro di errore.";
+}
+function suOrientamento(e) {
+  let h = null;
+  if (typeof e.webkitCompassHeading === "number") h = e.webkitCompassHeading;         // iPhone: già rispetto al nord
+  else if (e.absolute && typeof e.alpha === "number") h = (360 - e.alpha) % 360;      // Android: assoluto
+  if (h == null || !isFinite(h)) return;
+  haBussola = true; heading = h; aggiornaGuida();
+}
+async function avviaGuida() {
+  if (!S.pos) return;
+  if (!navigator.geolocation) { toast("Questo telefono non mi dà la posizione."); return; }
+  $("guida").hidden = false; $("guida-stato").textContent = "sto cercando il GPS…"; $("distanza").textContent = "—";
+  $("guida").scrollIntoView({ behavior: "smooth", block: "center" });
+  // la bussola va chiesta con un tocco (obbligatorio su iPhone)
+  try {
+    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+      const r = await DeviceOrientationEvent.requestPermission();
+      if (r === "granted") { bussola = suOrientamento; window.addEventListener("deviceorientation", bussola); }
+    } else if (typeof DeviceOrientationEvent !== "undefined") {
+      bussola = suOrientamento;
+      window.addEventListener("deviceorientationabsolute", bussola);
+      window.addEventListener("deviceorientation", bussola);
+    }
+  } catch (_) {}
+  if (watch != null) navigator.geolocation.clearWatch(watch);
+  watch = navigator.geolocation.watchPosition(p => {
+    ultima = { lat: p.coords.latitude, lon: p.coords.longitude, acc: Math.round(p.coords.accuracy) };
+    aggiornaGuida();
+  }, e => { $("guida-stato").textContent = "niente GPS"; $("guida-nota").textContent = messaggioErrore(e); },
+  { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+}
+function fermaGuida() {
+  if (watch != null && navigator.geolocation) navigator.geolocation.clearWatch(watch);
+  watch = null; ultima = null; haBussola = false; heading = null;
+  if (bussola) { window.removeEventListener("deviceorientationabsolute", bussola); window.removeEventListener("deviceorientation", bussola); bussola = null; }
+  $("guida").hidden = true;
+}
+$("riportami").addEventListener("click", avviaGuida);
+$("ferma-guida").addEventListener("click", fermaGuida);
+
+/* ---------- timer della sosta ---------- */
+let tick = null, avvisato = { poco: false, fine: false };
+function avviaTimer(min) {
+  min = Math.round(+min);
+  if (!(min >= 1 && min <= 1440)) { toast("Scrivi i minuti, da 1 a 1440."); return; }
+  S.fine = Date.now() + min * 60000; salva(); avvisato = { poco: false, fine: false };
+  // il permesso per gli avvisi si chiede solo qui, quando lo vuoi tu
+  try { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); } catch (_) {}
+  disegnaTimer(); toast("Timer partito: " + min + " min.");
+}
+function fermaTimer() { S.fine = null; salva(); disegnaTimer(); }
+async function avviso(titolo, testo) {
+  if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate([300, 150, 300, 150, 300]);
+  toast(titolo + " " + testo, 8000);
+  try {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const reg = await (navigator.serviceWorker && navigator.serviceWorker.getRegistration());
+      const op = { body: testo, icon: "icona-192.png", tag: "sosta", renotify: true, vibrate: [300, 150, 300] };
+      reg ? reg.showNotification(titolo, op) : new Notification(titolo, op);
+    }
+  } catch (_) {}
+}
+function disegnaTimer() {
+  clearInterval(tick);
+  const corsa = S.fine != null;
+  $("timer-scelta").hidden = corsa; $("timer-altro").hidden = corsa; $("timer-corsa").hidden = !corsa;
+  $("timer-avviso").hidden = false;
+  if (!corsa) { $("timer-nota").textContent = "quanto hai pagato?"; return; }
+  $("timer-nota").textContent = "scade alle " + hhmm(S.fine);
+  $("timer-fine").textContent = "Il parcheggio scade alle " + hhmm(S.fine) + ".";
+  const passo = () => {
+    const ms = S.fine - Date.now(), c = $("conto");
+    if (ms <= 0) {
+      const m = Math.floor(-ms / 60000);
+      c.textContent = "SCADUTO"; c.className = "conto scaduto";
+      $("timer-fine").textContent = m < 1 ? "È appena scaduto: corri!" : "Scaduto da " + m + " min: corri!";
+      if (!avvisato.fine) { avvisato.fine = true; avviso("Sosta scaduta!", "Torna alla macchina."); }
+      return;
+    }
+    const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+    c.textContent = (h ? h + ":" + pad(m) : pad(m)) + ":" + pad(s % 60);
+    c.className = "conto" + (ms <= 10 * 60000 ? " poco" : "");
+    if (ms <= 10 * 60000 && !avvisato.poco && ms > 60000) { avvisato.poco = true; avviso("Mancano 10 minuti", "alla fine della sosta."); }
+  };
+  passo(); tick = setInterval(passo, 1000);
+}
+$("timer-scelta").addEventListener("click", e => { const b = e.target.closest("button[data-min]"); if (b) avviaTimer(b.dataset.min); });
+$("avvia-minuti").addEventListener("click", () => avviaTimer($("minuti").value));
+$("minuti").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); avviaTimer($("minuti").value); } });
+$("ferma-timer").addEventListener("click", fermaTimer);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && S.pos) { disegna(); } });
+
+/* ---------- condividi e chiudi ---------- */
+$("condividi").addEventListener("click", async () => {
+  if (!S.pos) return;
+  const testo = "Ho parcheggiato qui" + (S.nota ? " (" + S.nota + ")" : "") + ": " + mapsLink(S.pos);
+  try {
+    if (navigator.share) await navigator.share({ text: testo });
+    else { await navigator.clipboard.writeText(testo); toast("Copiato: incollalo dove vuoi."); }
+  } catch (e) { if (!e || e.name !== "AbortError") toast("Non riesco a condividere da qui."); }
+});
+let conferma = 0;
+$("trovata").addEventListener("click", () => {
+  const b = $("trovata");
+  if (!conferma) {
+    b.textContent = "Sicuro? Cancello"; b.classList.add("conferma");
+    conferma = setTimeout(() => { conferma = 0; b.textContent = "Trovata!"; b.classList.remove("conferma"); }, 3500);
+    return;
+  }
+  clearTimeout(conferma); conferma = 0; b.textContent = "Trovata!"; b.classList.remove("conferma");
+  fermaGuida(); S = { pos: null, nota: "", fine: null }; salva(); disegna();
+  toast("Bene! Il posto è cancellato dal telefono.");
+});
+
+/* ---------- avvio, installazione, offline ---------- */
+carica(); disegna();
+setInterval(() => { if (S.pos && !document.hidden) $("quando").textContent = "segnata alle " + hhmm(S.pos.t) + " · " + fa(S.pos.t); }, 30000);
+let invito = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); invito = e; $("installa").classList.add("si"); });
+$("installa").addEventListener("click", async () => { if (!invito) return; invito.prompt(); try { await invito.userChoice; } catch (_) {} invito = null; $("installa").classList.remove("si"); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>

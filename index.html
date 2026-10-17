@@ -237,6 +237,7 @@ const DATI = {
   // il banco. Un regalo con «esce» nel futuro si vede «in arrivo» e si apre da solo a quell'ora.
   prodotti: [
     // { nome: "Timer p' 'a moka", emoji: "☕", descrizione: "...", link: "regali/timer-moka/", esce: "2026-10-09T19:00:00+02:00", lettera: "B", voti: 0 },
+    { nome: "Dove ho parcheggiato", emoji: "🚗", descrizione: "Scendi dalla macchina, tocchi un tasto e il posto si segna. Quando torni ti riporto lì con una freccia, e c'è anche il timer per la sosta. Il posto resta solo sul tuo telefono e funziona anche senza internet.", link: "parcheggio/", esce: "2026-10-16T19:00:00+02:00", lettera: "B", voti: 0 },
     { nome: "Lista della spesa a voce", emoji: "🛒", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", esce: "2026-10-09T19:00:00+02:00", lettera: "C", voti: 1 },
   ],
   // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
@@ -246,7 +247,7 @@ const DATI = {
       chiude: "2026-10-14T23:59:00+02:00",
       uscita: "2026-10-16T19:00:00+02:00",
       conteggio: "",
-      vince: "",
+      vince: "B",
       opzioni: [
         { lettera: "A", idea: "Promemoria della differenziata", voti: 0 },
         { lettera: "B", idea: "Dove ho parcheggiato", voti: 0 },
@@ -254,6 +255,8 @@ const DATI = {
       ],
     },
     diario: [
+      { giorno: 14, titolo: "Il secondo regalo è sul banco", testo: "Dove ho parcheggiato è uscita: gratis per tutti.", dal: "2026-10-16T19:00:00+02:00" },
+      { giorno: 13, titolo: "Ha vinto la B", testo: "Avete scelto Dove ho parcheggiato. Esce venerdì alle 19." },
       { giorno: 9, titolo: "Piazza nuova, tre idee nuove", testo: "La differenziata, il parcheggio e le fontanelle: si vota nei commenti fino a mercoledì." },
     ],
   },
