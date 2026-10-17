@@ -237,7 +237,7 @@ const DATI = {
   // il banco. Un regalo con «esce» nel futuro si vede «in arrivo» e si apre da solo a quell'ora.
   prodotti: [
     // { nome: "Timer p' 'a moka", emoji: "☕", descrizione: "...", link: "regali/timer-moka/", esce: "2026-10-09T19:00:00+02:00", lettera: "B", voti: 0 },
-    { nome: "Dove ho parcheggiato", emoji: "🚗", descrizione: "Scendi dalla macchina, tocchi un tasto e il posto si segna. Quando torni ti riporto lì con una freccia, e c'è anche il timer per la sosta. Il posto resta solo sul tuo telefono e funziona anche senza internet.", link: "parcheggio/", esce: "2026-10-16T19:00:00+02:00", lettera: "B", voti: 0 },
+    { nome: "Dove ho parcheggiato", emoji: "🚗", descrizione: "Scendi dalla macchina, tocchi un tasto e il posto si segna. Quando torni ti riporto lì con una freccia, e c'è anche il timer per la sosta. Il posto resta solo sul tuo telefono e funziona anche senza internet.", link: "parcheggio/", esce: "2026-10-16T19:00:00+02:00", lettera: "B", voti: 1 },
     { nome: "Lista della spesa a voce", emoji: "🛒", descrizione: "Dici cosa ti serve e la lista si scrive da sola, divisa per reparti. La spunti al supermercato e la mandi su WhatsApp. Funziona anche senza internet.", link: "spesa/", esce: "2026-10-09T19:00:00+02:00", lettera: "C", voti: 1 },
   ],
   // la settimana dopo, preparata in anticipo: da «dal» la pagina usa questo voto e aggiunge queste righe al diario
@@ -250,7 +250,7 @@ const DATI = {
       vince: "B",
       opzioni: [
         { lettera: "A", idea: "Promemoria della differenziata", voti: 0 },
-        { lettera: "B", idea: "Dove ho parcheggiato", voti: 0 },
+        { lettera: "B", idea: "Dove ho parcheggiato", voti: 1 },
         { lettera: "C", idea: "Dove sono le fontanelle", voti: 0 },
       ],
     },
@@ -341,7 +341,7 @@ function render() {
     .sort((a, b) => (b.t || 0) - (a.t || 0));
   const card = p => {
     const arrivo = p.t && now < p.t, nuovo = !arrivo && p.t && now - p.t < 7 * 864e5;
-    const vinto = p.lettera ? `<small>Ha vinto la ${esc(p.lettera)}${p.voti ? " con " + num(p.voti) + " voti" : ""}</small>` : "";
+    const vinto = p.lettera ? `<small>Ha vinto la ${esc(p.lettera)}${p.voti ? " con " + num(p.voti) + (p.voti === 1 ? " voto" : " voti") : ""}</small>` : "";
     return `<article class="prodotto${arrivo ? " arrivo" : nuovo ? " nuovo" : ""}">
       ${arrivo ? '<span class="badge">In arrivo</span>' : nuovo ? '<span class="badge">Nuovo</span>' : ""}
       <h3>${p.emoji ? esc(p.emoji) + " " : ""}${esc(p.nome)}</h3><p>${esc(p.descrizione)}</p>
