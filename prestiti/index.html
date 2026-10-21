@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quaderno dei prestiti · Gennarino</title>
+<meta name="description" content="Segna cosa hai prestato e a chi, o cosa hai preso in prestito, e non te lo scordi più. Il regalo di Gennarino, 'O Bancariello: gratis, senza registrazione e senza pubblicità.">
+<meta name="theme-color" content="#171a33">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icona-192.png">
+<link rel="apple-touch-icon" href="icona-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prestiti">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Figtree:wght@400;600;800&display=swap">
+<style>
+:root{
+  --notte:#171a33; --carta:#fbf3e2; --carta-2:#f3e8d0; --riga:#e2d5b8;
+  --inchiostro:#2a2230; --tenue:#7a6f63; --pomodoro:#e63946; --pomodoro-scuro:#b02a35;
+  --led:#1aa88c; --ok:#1d7a55; --avviso:#c46a00;
+  --display:"Bungee","Arial Black",Impact,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--carta:#1d2140;--carta-2:#262b52;--riga:#363b6b;--inchiostro:#eef0ff;--tenue:#a9aed6;--led:#4ff0d0;--ok:#57d39a;--avviso:#ffb454;color-scheme:dark}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--carta);color:var(--inchiostro);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100dvh;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.tenda{height:34px;background:repeating-linear-gradient(90deg,var(--pomodoro) 0 44px,#fbf3e2 44px 88px);position:relative}
+.tenda::after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:14px;
+  background:radial-gradient(circle at 22px 0,var(--pomodoro) 21px,transparent 22px) 0 0/88px 14px repeat-x,
+             radial-gradient(circle at 66px 0,#fbf3e2 21px,transparent 22px) 0 0/88px 14px repeat-x}
+main{max-width:520px;margin:0 auto;padding:30px 16px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+p{margin:0}
+header{display:flex;gap:14px;align-items:center}
+header>div{min-width:0}
+header svg{flex:0 0 64px;width:64px;height:auto}
+header h1{font-family:var(--display);font-weight:400;font-size:1.55rem;line-height:1.05;margin:0}
+header p{margin:2px 0 0;color:var(--tenue);font-size:.92rem}
+h2{font-family:var(--display);font-weight:400;font-size:1.05rem;margin:0 0 10px}
+.scheda{background:var(--carta-2);border:2px solid var(--riga);border-radius:18px;padding:16px}
+.paste{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.paste button{min-width:0;border:2px solid var(--riga);background:var(--carta);border-radius:14px;padding:10px 8px;text-align:left;cursor:pointer;touch-action:manipulation;display:grid;gap:2px}
+.paste button b{font-weight:800}
+.paste button span{color:var(--tenue);font-size:.9rem}
+.paste button[aria-pressed=true]{border-color:var(--pomodoro);background:var(--pomodoro);color:#fff}
+.paste button[aria-pressed=true] span{color:#ffe3e5}
+.regola{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.regola b{font-family:var(--display);font-weight:400;font-size:1.5rem;min-width:3.4ch;text-align:center}
+.regola button{width:52px;height:52px;border-radius:50%;border:2px solid var(--riga);background:var(--carta);font-size:1.6rem;font-weight:800;cursor:pointer;touch-action:manipulation}
+.regola small{color:var(--tenue);display:block;text-align:center;font-size:.8rem}
+.passi{margin:0;padding-left:1.2em;color:var(--tenue);font-size:.95rem}
+.passi li+li{margin-top:2px}
+.orologio{display:grid;justify-items:center;gap:14px}
+.anello{position:relative;width:min(72vw,270px);aspect-ratio:1}
+.anello svg{width:100%;height:100%;transform:rotate(-90deg)}
+.anello circle{fill:none;stroke-width:12;stroke-linecap:round}
+.anello .fondo{stroke:var(--riga)}
+.anello .corsa{stroke:var(--pomodoro);transition:stroke-dashoffset .25s linear}
+.anello.assaggia .corsa{stroke:var(--avviso)}
+.anello.finito .corsa{stroke:var(--led)}
+.tempo{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.tempo b{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,15vw,3.6rem);line-height:1;font-variant-numeric:tabular-nums}
+.tempo span{color:var(--tenue);font-size:.95rem;margin-top:4px}
+.messaggio{font-weight:800;font-size:1.1rem;text-align:center;min-height:1.5em}
+.messaggio.allarme{color:var(--pomodoro);animation:lampeggia .8s steps(2) infinite}
+@keyframes lampeggia{50%{opacity:.35}}
+.azioni{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+.grande{grid-column:1/-1;border:0;border-radius:18px;background:var(--pomodoro);color:#fff;font-family:var(--display);font-size:1.4rem;padding:18px;cursor:pointer;box-shadow:0 7px 0 var(--pomodoro-scuro);touch-action:manipulation}
+.grande:active{transform:translateY(5px);box-shadow:0 2px 0 var(--pomodoro-scuro)}
+.grande.verde{background:var(--led);box-shadow:0 7px 0 #0e6e5c}
+.piccolo{border:2px solid var(--riga);background:var(--carta);border-radius:14px;padding:12px;font-weight:800;cursor:pointer;touch-action:manipulation}
+.opz{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--tenue);font-size:.95rem}
+.opz input{width:22px;height:22px;accent-color:var(--pomodoro)}
+footer{max-width:520px;margin:6px auto 0;padding:0 16px;text-align:center;color:var(--tenue);font-size:.88rem}
+footer a{color:inherit}
+@media (prefers-reduced-motion:reduce){.messaggio.allarme{animation:none}.anello .corsa{transition:none}}
+</style>
+<style>
+.nuovo{display:grid;gap:12px}
+.nuovo label{display:grid;gap:4px;font-weight:800;font-size:.92rem}
+.nuovo input[type=text],.nuovo input[type=date]{width:100%;min-width:0;border:2px solid var(--riga);background:var(--carta);color:var(--inchiostro);border-radius:12px;padding:11px 12px;font:inherit;font-weight:600}
+.nuovo input:focus-visible,button:focus-visible{outline:3px solid var(--led);outline-offset:2px}
+.verso{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.verso button{border:2px solid var(--riga);background:var(--carta);border-radius:14px;padding:12px 8px;font-weight:800;cursor:pointer;touch-action:manipulation;min-width:0}
+.verso button[aria-pressed=true]{background:var(--pomodoro);border-color:var(--pomodoro);color:#fff}
+.err{color:var(--pomodoro);font-weight:800;min-height:1.3em}
+.filtri{display:flex;gap:8px;flex-wrap:wrap}
+.filtri button{border:2px solid var(--riga);background:var(--carta);border-radius:999px;padding:7px 14px;font-weight:800;cursor:pointer}
+.filtri button[aria-pressed=true]{background:var(--notte);border-color:var(--notte);color:#fff}
+.lista{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.voce{background:var(--carta);border:2px solid var(--riga);border-left-width:8px;border-radius:14px;padding:12px;display:grid;gap:6px;min-width:0}
+.voce.dato{border-left-color:var(--pomodoro)}
+.voce.preso{border-left-color:var(--led)}
+.voce.scaduto{box-shadow:0 0 0 2px var(--avviso) inset}
+.voce.chiuso{opacity:.6}
+.voce .riga1{display:flex;justify-content:space-between;gap:10px;align-items:baseline;min-width:0}
+.voce b{overflow-wrap:anywhere}
+.voce .chi{color:var(--tenue);font-size:.95rem;overflow-wrap:anywhere}
+.voce .quando{font-size:.88rem;color:var(--tenue)}
+.voce .quando.sc{color:var(--avviso);font-weight:800}
+.voce .az{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.voce .az button{border:2px solid var(--riga);background:var(--carta-2);border-radius:10px;padding:7px 10px;font-weight:800;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+.voce .az .ok{background:var(--led);border-color:var(--led);color:#06352c}
+.voce .az .no{color:var(--pomodoro)}
+.vuoto{text-align:center;color:var(--tenue);padding:12px}
+.conta{display:flex;gap:10px;flex-wrap:wrap;font-size:.95rem;color:var(--tenue)}
+.conta b{color:var(--inchiostro)}
+</style>
+</head>
+<body>
+<div class="tenda"></div>
+<main>
+  <header>
+    <svg viewBox="0 0 120 130" aria-hidden="true">
+      <line x1="60" y1="6" x2="60" y2="22" stroke="#a9aed6" stroke-width="4"/>
+      <circle cx="60" cy="8" r="7" fill="#e63946"/>
+      <rect x="10" y="20" width="100" height="66" rx="20" fill="#e8edf5"/>
+      <rect x="18" y="27" width="84" height="52" rx="14" fill="#0e1824"/>
+      <rect x="2" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <rect x="108" y="42" width="10" height="20" rx="4" fill="#ff7a5a"/>
+      <path d="M33 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M69 52 q9 -11 18 0" stroke="#4ff0d0" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="51" y="62" width="18" height="6" rx="3" fill="#4ff0d0"/>
+      <rect x="24" y="92" width="72" height="38" rx="14" fill="#ced6e2"/>
+      <rect x="38" y="100" width="44" height="16" rx="5" fill="#28344a"/>
+      <circle cx="47" cy="108" r="3" fill="#4ff0d0"/><circle cx="56" cy="108" r="3" fill="#4ff0d0"/><circle cx="65" cy="108" r="3" fill="#4ff0d0"/><circle cx="74" cy="108" r="3" fill="#1e5a5a"/>
+    </svg>
+    <div>
+      <h1>Quaderno dei prestiti</h1>
+      <p>Chi ha cosa. Un regalo di Gennarino.</p>
+    </div>
+  </header>
+
+  <section class="scheda" aria-label="Nuovo prestito">
+    <h2>Segna un prestito</h2>
+    <form class="nuovo" id="form" autocomplete="off" novalidate>
+      <div class="verso" role="group" aria-label="Chi ha cosa">
+        <button type="button" id="vDato" aria-pressed="true">L'ho prestato io</button>
+        <button type="button" id="vPreso" aria-pressed="false">Me l'hanno prestato</button>
+      </div>
+      <label>Cosa <input type="text" id="cosa" maxlength="80" placeholder="Il trapano, 20 euro, un libro…"></label>
+      <label><span id="chiLabel">A chi</span> <input type="text" id="chi" maxlength="60" placeholder="Nome"></label>
+      <label>Da restituire entro (se vuoi) <input type="date" id="entro"></label>
+      <div class="err" id="err" role="alert"></div>
+      <button type="submit" class="grande">Scrivi sul quaderno</button>
+    </form>
+  </section>
+
+  <section class="scheda" aria-label="Il quaderno">
+    <h2>Il quaderno</h2>
+    <div class="filtri" role="group" aria-label="Filtro">
+      <button type="button" data-f="aperti" aria-pressed="true">Ancora fuori</button>
+      <button type="button" data-f="chiusi" aria-pressed="false">Restituiti</button>
+    </div>
+    <p class="conta" id="conta" style="margin:12px 0"></p>
+    <ul class="lista" id="lista"></ul>
+    <div class="azioni" style="margin-top:14px">
+      <button type="button" class="piccolo" id="copia">Copia l'elenco</button>
+      <button type="button" class="piccolo" id="svuota" hidden>Cancella i restituiti</button>
+    </div>
+    <p class="err" id="msg" role="status" style="color:var(--ok)"></p>
+  </section>
+</main>
+<footer>Gratis, senza registrazione e senza pubblicità. I nomi e le cose restano solo sul tuo telefono, funziona anche senza internet.<br>
+  Se cancelli i dati del browser il quaderno si svuota: ogni tanto usa «Copia l'elenco».<br>
+  <a href="../">'O Bancariello</a> · <a href="https://www.tiktok.com/@bancariello.gennarino" target="_blank" rel="noopener">Gennarino su TikTok</a></footer>
+<script>
+"use strict";
+const CHIAVE = "quaderno-prestiti-v1";
+const $ = id => document.getElementById(id);
+let voci = [], dato = true, filtro = "aperti", confermaId = null;
+
+function leggi(){ try { const v = JSON.parse(localStorage.getItem(CHIAVE) || "[]"); return Array.isArray(v) ? v.filter(x => x && typeof x.cosa === "string") : []; } catch (_) { return []; } }
+function salva(){ try { localStorage.setItem(CHIAVE, JSON.stringify(voci)); } catch (_) { $("msg").textContent = "Non riesco a salvare: la memoria del browser è bloccata."; } }
+const oggi = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+function data(s){ if (!s) return ""; const [a, m, g] = s.split("-"); return g + "/" + m + "/" + a; }
+function giorniDa(iso){ return Math.max(0, Math.round((new Date(oggi()) - new Date(iso.slice(0, 10))) / 864e5)); }
+
+function verso(d){
+  dato = d; $("vDato").setAttribute("aria-pressed", d); $("vPreso").setAttribute("aria-pressed", !d);
+  $("chiLabel").textContent = d ? "A chi" : "Da chi";
+}
+$("vDato").addEventListener("click", () => verso(true));
+$("vPreso").addEventListener("click", () => verso(false));
+document.querySelectorAll(".filtri button").forEach(b => b.addEventListener("click", () => {
+  filtro = b.dataset.f; confermaId = null;
+  document.querySelectorAll(".filtri button").forEach(x => x.setAttribute("aria-pressed", x === b)); disegna();
+}));
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const cosa = $("cosa").value.trim(), chi = $("chi").value.trim();
+  if (!cosa || !chi){ $("err").textContent = !cosa ? "Scrivi cosa hai prestato." : "Scrivi il nome."; return; }
+  $("err").textContent = "";
+  voci.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), cosa, chi, dato, entro: $("entro").value || "", quando: oggi(), chiuso: "" });
+  salva(); $("cosa").value = ""; $("chi").value = ""; $("entro").value = "";
+  filtro = "aperti"; document.querySelectorAll(".filtri button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f === "aperti"));
+  $("msg").textContent = "Scritto sul quaderno."; disegna();
+});
+
+function riga(v){
+  const li = document.createElement("li");
+  const scad = !v.chiuso && v.entro && v.entro < oggi();
+  li.className = "voce " + (v.dato ? "dato" : "preso") + (scad ? " scaduto" : "") + (v.chiuso ? " chiuso" : "");
+  const r1 = document.createElement("div"); r1.className = "riga1";
+  const b = document.createElement("b"); b.textContent = v.cosa;
+  r1.append(b); li.append(r1);
+  const chi = document.createElement("div"); chi.className = "chi";
+  chi.textContent = (v.dato ? "Prestato a " : "Preso in prestito da ") + v.chi;
+  li.append(chi);
+  const q = document.createElement("div"); q.className = "quando" + (scad ? " sc" : "");
+  if (v.chiuso) q.textContent = "Restituito il " + data(v.chiuso);
+  else { const g = giorniDa(v.quando); q.textContent = (g === 0 ? "Da oggi" : "Da " + g + (g === 1 ? " giorno" : " giorni")) + (v.entro ? " · entro il " + data(v.entro) + (scad ? " (scaduto!)" : "") : ""); }
+  li.append(q);
+  const az = document.createElement("div"); az.className = "az";
+  const btn = (t, c, f) => { const x = document.createElement("button"); x.type = "button"; x.textContent = t; if (c) x.className = c; x.addEventListener("click", f); az.append(x); };
+  if (!v.chiuso){
+    btn(v.dato ? "Me l'ha restituito" : "L'ho restituito", "ok", () => { v.chiuso = oggi(); confermaId = null; salva(); disegna(); });
+    if (v.dato) btn("Scrivigli su WhatsApp", "", () => { window.open("https://wa.me/?text=" + encodeURIComponent("Ciao " + v.chi + ", ti ricordi di " + v.cosa + "? Quando riesci me lo riporti? Grazie!"), "_blank", "noopener"); });
+  } else btn("Rimetti fuori", "", () => { v.chiuso = ""; salva(); disegna(); });
+  if (confermaId === v.id){
+    btn("Sì, cancella", "no", () => { voci = voci.filter(x => x.id !== v.id); confermaId = null; salva(); disegna(); });
+    btn("No", "", () => { confermaId = null; disegna(); });
+  } else btn("Cancella", "no", () => { confermaId = v.id; disegna(); });
+  li.append(az); return li;
+}
+function disegna(){
+  const aperti = voci.filter(v => !v.chiuso), chiusi = voci.filter(v => v.chiuso);
+  const fuori = aperti.filter(v => v.dato).length, miei = aperti.filter(v => !v.dato).length, scad = aperti.filter(v => v.entro && v.entro < oggi()).length;
+  $("conta").innerHTML = "";
+  [["Prestate da me", fuori], ["Da restituire io", miei], ["Scaduti", scad]].forEach(([t, n]) => { const s = document.createElement("span"); const b = document.createElement("b"); b.textContent = n; s.append(b, " " + t.toLowerCase()); $("conta").append(s); });
+  const l = (filtro === "aperti" ? aperti : chiusi).slice().sort((a, b) => (a.entro && b.entro ? a.entro.localeCompare(b.entro) : a.entro ? -1 : b.entro ? 1 : 0));
+  $("lista").innerHTML = "";
+  if (!l.length){ const li = document.createElement("li"); li.className = "vuoto"; li.textContent = filtro === "aperti" ? "Niente in giro: il quaderno è pulito." : "Ancora nessun restituito."; $("lista").append(li); }
+  l.forEach(v => $("lista").append(riga(v)));
+  $("svuota").hidden = !(filtro === "chiusi" && chiusi.length);
+}
+$("svuota").addEventListener("click", () => { voci = voci.filter(v => !v.chiuso); salva(); disegna(); });
+$("copia").addEventListener("click", async () => {
+  const aperti = voci.filter(v => !v.chiuso);
+  const t = aperti.length ? "Quaderno dei prestiti (" + data(oggi()) + ")\n" + aperti.map(v => "- " + v.cosa + (v.dato ? " → prestato a " : " ← preso in prestito da ") + v.chi + (v.entro ? " (entro " + data(v.entro) + ")" : "")).join("\n") : "Quaderno dei prestiti: niente in giro.";
+  try { await navigator.clipboard.writeText(t); $("msg").textContent = "Elenco copiato."; } catch (_) { $("msg").textContent = "Non riesco a copiare da qui: seleziona e copia a mano."; }
+});
+
+voci = leggi(); disegna(); verso(true);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
