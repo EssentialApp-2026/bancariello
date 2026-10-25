@@ -394,7 +394,53 @@ function tick() {
   $("cd-m").textContent = pad(m); $("cd-s").textContent = pad(Math.floor(ms / 1000));
 }
 
+// Spinta prepara da sola le settimane nuove (automatico/banco.json nel suo repository): voto, risultato, regali e diario arrivano da lì.
+async function automatico() {
+  try {
+    const r = await fetch("/Spinta/automatico/banco.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) return;
+    const B = await r.json(), now = new Date();
+    const W = (B.settimane || []).filter(s => s && s.dal && s.chiude && s.uscita && Array.isArray(s.opzioni) && s.opzioni.length === 3)
+      .sort((a, b) => new Date(a.dal) - new Date(b.dal));
+    if (!W.length) return;
+    const g = iso => Math.max(1, Math.floor((new Date(iso) - new Date(DATI.inizio)) / 864e5) + 1);
+    const voto = s => ({ chiude: s.chiude, uscita: s.uscita, conteggio: s.conteggio || "", vince: s.vince || "",
+      opzioni: s.opzioni.map(o => ({ lettera: o.lettera, idea: o.idea, voti: +o.voti || 0 })) });
+    const regalo = s => s.vince && s.regali ? s.regali[s.vince] : null;
+    const righe = s => {
+      const L = [], R = regalo(s), idee = s.opzioni.map(o => o.idea);
+      L.push({ giorno: g(s.dal), titolo: (s.piazza || "Piazza nuova") + ", idee nuove", testo: idee[0] + ", " + idee[1] + " e " + idee[2] + ": si vota nei commenti fino a mercoledì.", dal: s.dal });
+      const gio = g(new Date(+new Date(s.chiude) + 60000).toISOString());   // il giovedì, a voto chiuso
+      if (s.vince === "nessuno") L.push({ giorno: gio, titolo: "Niente voti, niente app", testo: "Nei commenti non ha votato nessuno: questa settimana niente regalo.", dal: s.chiude });
+      else if (R) {
+        L.push({ giorno: gio, titolo: "Ha vinto la " + s.vince, testo: "Avete scelto " + R.nome + ". Esce venerdì alle 19.", dal: s.chiude });
+        L.push({ giorno: g(s.uscita), titolo: "Il regalo è sul banco", testo: R.nome + " è uscita: gratis per tutti.", dal: s.uscita });
+      }
+      return L.reverse();
+    };
+    const passate = W.filter(s => now >= new Date(s.dal)), future = W.filter(s => now < new Date(s.dal));
+    if (passate.length) {
+      const ultima = passate[passate.length - 1];
+      DATI.voto = voto(ultima);
+      if (DATI.prossimo && new Date(DATI.prossimo.dal) <= new Date(ultima.dal)) DATI.prossimo = null;
+    }
+    if (future.length) DATI.prossimo = { dal: future[0].dal, voto: voto(future[0]), diario: righe(future[0]) };
+    const visti = new Set(DATI.diario.map(e => e.titolo + "|" + e.giorno));
+    for (const s of passate) {
+      for (const e of righe(s)) if (!visti.has(e.titolo + "|" + e.giorno)) { DATI.diario.push(e); visti.add(e.titolo + "|" + e.giorno); }
+      const R = regalo(s);
+      if (R && !DATI.prodotti.some(p => p.link === R.link))
+        DATI.prodotti.unshift({ nome: R.nome, emoji: R.emoji, descrizione: R.descrizione, link: R.link, esce: s.uscita, lettera: s.vince,
+          voti: (s.opzioni.find(o => o.lettera === s.vince) || {}).voti || 0 });
+    }
+    DATI.diario.sort((a, b) => b.giorno - a.giorno);
+    render(); tick();
+  } catch (_) {}
+}
+
 render(); tick();
+automatico();
+setInterval(automatico, 15 * 60000);
 setInterval(tick, 1000);
 setInterval(render, 60000);
 </script>
